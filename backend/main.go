@@ -47,7 +47,7 @@ func main() {
 	// Get port from environment variables or use default
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "3000"
 	}
 
 	// Defer closing database connection

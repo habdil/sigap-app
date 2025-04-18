@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/widgets/login_bottom_sheet.dart';
+import 'package:frontend/ui/widgets/register_bottom_sheet.dart'; // Import the register bottom sheet
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -150,7 +151,8 @@ class HomePage extends StatelessWidget {
                       child: Center(
                         child: GestureDetector(
                           onTap: () {
-                            // TODO: Navigasi ke halaman pembuatan akun
+                            // Show register bottom sheet
+                            _showRegisterBottomSheet(context);
                           },
                           child: RichText(
                             text: TextSpan(
@@ -192,6 +194,23 @@ class HomePage extends StatelessWidget {
             bottom: MediaQuery.of(context).viewInsets.bottom, // Mengatasi keyboard
           ),
           child: const LoginBottomSheet(),
+        );
+      },
+    );
+  }
+  
+  // Fungsi untuk menampilkan register bottom sheet
+  void _showRegisterBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Agar bottom sheet bisa memenuhi konten
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom, // Mengatasi keyboard
+          ),
+          child: const RegisterBottomSheet(),
         );
       },
     );

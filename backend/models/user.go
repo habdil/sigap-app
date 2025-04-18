@@ -11,8 +11,8 @@ type User struct {
 	ID           int       `json:"id"`
 	Username     string    `json:"username"`
 	Email        string    `json:"email"`
-	PasswordHash string    `json:"-"`                  // "-" means this field won't be included in JSON responses
-	Password     string    `json:"password,omitempty"` // Used for incoming requests, not stored
+	PasswordHash string    `json:"-"` // "-" means this field won't be included in JSON responses
+	Password     string    `json:"password,omitempty"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
