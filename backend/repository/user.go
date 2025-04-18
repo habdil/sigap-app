@@ -1,26 +1,24 @@
 package repository
 
 import (
-	"database/sql"
+	"context"
 	"errors"
 
-	"github.com/habdil/sigap-app/backend/app/models"
-	"github.com/habdil/sigap-app/backend/app/config"
+	"github.com/jackc/pgx/v5"
+
+	"github.com/habdil/sigap-app/backend/config"
+	"github.com/habdil/sigap-app/backend/models"
 )
 
-// UserRepository handles all database operations for users
-type UserRepository struct {
-	DB *sql.DB
-}
+// UserRepository menangani semua operasi database untuk pengguna
+type UserRepository struct{}
 
-// NewUserRepository creates a new instance of UserRepository
+// NewUserRepository membuat instance baru dari UserRepository
 func NewUserRepository() *UserRepository {
-	return &UserRepository{
-		DB: config.DB,
-	}
+	return &UserRepository{}
 }
 
-// CreateUser creates a new user in the database
+// CreateUser membuat pengguna baru di database
 func (r *UserRepository) CreateUser(user *models.User) error {
 	query := `
 	INSERT INTO users (username, email, password_hash)
@@ -28,7 +26,8 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 	RETURNING id, created_at, updated_at
 	`
 
-	err := r.DB.QueryRow(
+	err := config.DBPool.QueryRow(
+		context.Background(),
 		query,
 		user.Username,
 		user.Email,
@@ -42,7 +41,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 	return nil
 }
 
-// GetUserByEmail retrieves a user by email
+// GetUserByEmail mengambil pengguna berdasarkan email
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 	query := `
@@ -51,7 +50,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	WHERE email = $1
 	`
 
-	err := r.DB.QueryRow(query, email).Scan(
+	err := config.DBPool.QueryRow(context.Background(), query, email).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Email,
@@ -61,7 +60,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
@@ -70,7 +69,7 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	return user, nil
 }
 
-// GetUserByID retrieves a user by ID
+// GetUserByID mengambil pengguna berdasarkan ID
 func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	user := &models.User{}
 	query := `
@@ -79,7 +78,7 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	WHERE id = $1
 	`
 
-	err := r.DB.QueryRow(query, id).Scan(
+	err := config.DBPool.QueryRow(context.Background(), query, id).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Email,
@@ -88,7 +87,7 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
@@ -97,12 +96,12 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	return user, nil
 }
 
-// IsEmailTaken checks if an email is already taken
+// IsEmailTaken memeriksa apakah email sudah digunakan
 func (r *UserRepository) IsEmailTaken(email string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)`
 
-	err := r.DB.QueryRow(query, email).Scan(&exists)
+	err := config.DBPool.QueryRow(context.Background(), query, email).Scan(&exists)
 	if err != nil {
 		return false, err
 	}
@@ -110,12 +109,12 @@ func (r *UserRepository) IsEmailTaken(email string) (bool, error) {
 	return exists, nil
 }
 
-// IsUsernameTaken checks if a username is already taken
+// IsUsernameTaken memeriksa apakah username sudah digunakan
 func (r *UserRepository) IsUsernameTaken(username string) (bool, error) {
 	var exists bool
 	query := `SELECT EXISTS(SELECT 1 FROM users WHERE username = $1)`
 
-	err := r.DB.QueryRow(query, username).Scan(&exists)
+	err := config.DBPool.QueryRow(context.Background(), query, username).Scan(&exists)
 	if err != nil {
 		return false, err
 	}
