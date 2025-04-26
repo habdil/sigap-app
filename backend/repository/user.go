@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/habdil/sigap-app/backend/config"
 	"github.com/habdil/sigap-app/backend/models"
@@ -21,8 +22,8 @@ func NewUserRepository() *UserRepository {
 // CreateUser membuat pengguna baru di database
 func (r *UserRepository) CreateUser(user *models.User) error {
 	query := `
-	INSERT INTO users (username, email, password_hash)
-	VALUES ($1, $2, $3)
+	INSERT INTO users (username, email, password_hash, google_id)
+	VALUES ($1, $2, $3, $4)
 	RETURNING id, created_at, updated_at
 	`
 
@@ -32,6 +33,7 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 		user.Username,
 		user.Email,
 		user.PasswordHash,
+		user.GoogleID,
 	).Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
@@ -45,16 +47,24 @@ func (r *UserRepository) CreateUser(user *models.User) error {
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 	query := `
-	SELECT id, username, email, password_hash, created_at, updated_at 
+	SELECT id, username, email, password_hash, google_id, age, height, weight, created_at, updated_at 
 	FROM users 
 	WHERE email = $1
 	`
+
+	var ageNull pgtype.Int4
+	var heightNull, weightNull pgtype.Float8
+	var googleIDNull pgtype.Text
 
 	err := config.DBPool.QueryRow(context.Background(), query, email).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Email,
 		&user.PasswordHash,
+		&googleIDNull,
+		&ageNull,
+		&heightNull,
+		&weightNull,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -66,6 +76,19 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 
+	if googleIDNull.Valid {
+		user.GoogleID = googleIDNull.String
+	}
+	if ageNull.Valid {
+		user.Age = int(ageNull.Int32)
+	}
+	if heightNull.Valid {
+		user.Height = heightNull.Float64
+	}
+	if weightNull.Valid {
+		user.Weight = weightNull.Float64
+	}
+
 	return user, nil
 }
 
@@ -73,15 +96,23 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 	user := &models.User{}
 	query := `
-	SELECT id, username, email, created_at, updated_at 
+	SELECT id, username, email, google_id, age, height, weight, created_at, updated_at 
 	FROM users 
 	WHERE id = $1
 	`
+
+	var ageNull pgtype.Int4
+	var heightNull, weightNull pgtype.Float8
+	var googleIDNull pgtype.Text
 
 	err := config.DBPool.QueryRow(context.Background(), query, id).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Email,
+		&googleIDNull,
+		&ageNull,
+		&heightNull,
+		&weightNull,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -91,6 +122,67 @@ func (r *UserRepository) GetUserByID(id int) (*models.User, error) {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
+	}
+
+	if googleIDNull.Valid {
+		user.GoogleID = googleIDNull.String
+	}
+	if ageNull.Valid {
+		user.Age = int(ageNull.Int32)
+	}
+	if heightNull.Valid {
+		user.Height = heightNull.Float64
+	}
+	if weightNull.Valid {
+		user.Weight = weightNull.Float64
+	}
+
+	return user, nil
+}
+
+// GetUserByGoogleID mengambil pengguna berdasarkan Google ID
+func (r *UserRepository) GetUserByGoogleID(googleID string) (*models.User, error) {
+	user := &models.User{}
+	query := `
+	SELECT id, username, email, google_id, age, height, weight, created_at, updated_at 
+	FROM users 
+	WHERE google_id = $1
+	`
+
+	var ageNull pgtype.Int4
+	var heightNull, weightNull pgtype.Float8
+	var googleIDNull pgtype.Text
+
+	err := config.DBPool.QueryRow(context.Background(), query, googleID).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&googleIDNull,
+		&ageNull,
+		&heightNull,
+		&weightNull,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	if googleIDNull.Valid {
+		user.GoogleID = googleIDNull.String
+	}
+	if ageNull.Valid {
+		user.Age = int(ageNull.Int32)
+	}
+	if heightNull.Valid {
+		user.Height = heightNull.Float64
+	}
+	if weightNull.Valid {
+		user.Weight = weightNull.Float64
 	}
 
 	return user, nil

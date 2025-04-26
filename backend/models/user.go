@@ -13,6 +13,10 @@ type User struct {
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"-"` // "-" means this field won't be included in JSON responses
 	Password     string    `json:"password,omitempty"`
+	GoogleID     string    `json:"google_id,omitempty"`
+	Age          int       `json:"age,omitempty"`
+	Height       float64   `json:"height,omitempty"`
+	Weight       float64   `json:"weight,omitempty"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
@@ -47,8 +51,22 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// GoogleLoginRequest represents the request body for Google login
+type GoogleLoginRequest struct {
+	GoogleID string `json:"google_id" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Username string `json:"username" binding:"required"`
+}
+
 // AuthResponse represents the response for authentication endpoints
 type AuthResponse struct {
 	Token string `json:"token"`
 	User  User   `json:"user"`
+}
+
+// ProfileUpdateRequest represents the request to update a user's profile
+type ProfileUpdateRequest struct {
+	Age    int     `json:"age" binding:"required"`
+	Height float64 `json:"height" binding:"required"`
+	Weight float64 `json:"weight" binding:"required"`
 }

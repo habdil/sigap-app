@@ -63,6 +63,27 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
+// GoogleLogin handles the user login with Google
+func (c *AuthController) GoogleLogin(ctx *gin.Context) {
+	var req models.GoogleLoginRequest
+
+	// Bind the request body to the Google login request struct
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Call the service to authenticate the user with Google
+	response, err := c.authService.GoogleLogin(req)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return the response
+	ctx.JSON(http.StatusOK, response)
+}
+
 // GetCurrentUser gets the current user profile
 func (c *AuthController) GetCurrentUser(ctx *gin.Context) {
 	// Get user ID from context (set by auth middleware)

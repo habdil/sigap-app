@@ -16,6 +16,7 @@ func SetupAuthRoutes(router *gin.Engine) {
 	{
 		auth.POST("/signup", authController.SignUp)
 		auth.POST("/login", authController.Login)
+		auth.POST("/google-login", authController.GoogleLogin)
 	}
 
 	// Protected routes

@@ -100,6 +100,49 @@ func (s *AuthService) Login(req models.LoginRequest) (*models.AuthResponse, erro
 	return response, nil
 }
 
+// GoogleLogin authenticates or creates a user using Google credentials
+func (s *AuthService) GoogleLogin(req models.GoogleLoginRequest) (*models.AuthResponse, error) {
+	// Check if user with Google ID exists
+	user, err := s.userRepo.GetUserByGoogleID(req.GoogleID)
+	if err != nil {
+		// User does not exist, create new user
+		emailTaken, err := s.userRepo.IsEmailTaken(req.Email)
+		if err != nil {
+			return nil, err
+		}
+		if emailTaken {
+			return nil, errors.New("email already in use by another account")
+		}
+
+		// Create user
+		user = &models.User{
+			Username: req.Username,
+			Email:    req.Email,
+			GoogleID: req.GoogleID,
+			// No password for Google login
+		}
+
+		// Save user to database
+		if err := s.userRepo.CreateUser(user); err != nil {
+			return nil, err
+		}
+	}
+
+	// Generate JWT token
+	token, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create response
+	response := &models.AuthResponse{
+		Token: token,
+		User:  *user,
+	}
+
+	return response, nil
+}
+
 // GetUserByID retrieves a user by ID
 func (s *AuthService) GetUserByID(id int) (*models.User, error) {
 	return s.userRepo.GetUserByID(id)
