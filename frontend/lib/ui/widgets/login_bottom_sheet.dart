@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
+import 'package:frontend/ui/pages/dashboard_page.dart';
 import 'package:frontend/ui/widgets/register_bottom_sheet.dart'; // Import register bottom sheet
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/models/user_model.dart';
@@ -50,7 +51,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ),
             ),
           ),
-          
+
           // Welcome back text - now aligned left with bigger font
           Text(
             'Welcome\nBack User!',
@@ -61,7 +62,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             ),
           ),
           const SizedBox(height: 32),
-          
+
           // Email/Username Field
           TextField(
             controller: _emailController,
@@ -77,7 +78,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           // Password Field
           TextField(
             controller: _passwordController,
@@ -94,7 +95,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
             ),
           ),
           const SizedBox(height: 36),
-          
+
           // Error message display
           if (_errorMessage != null)
             Container(
@@ -114,78 +115,88 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 ),
               ),
             ),
-          
+
           // Sign In Button
           SizedBox(
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: !_isLoading ? () async {
-                // Validate inputs
-                if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-                  setState(() {
-                    _errorMessage = 'Please enter email/username and password';
-                  });
-                  return;
-                }
-                
-                // Clear any previous errors
-                setState(() {
-                  _errorMessage = null;
-                  _isLoading = true;
-                });
-                
-                // Call login API
-                try {
-                  final result = await AuthService.login(
-                    usernameOrEmail: _emailController.text,
-                    password: _passwordController.text,
-                  );
-                  
-                  setState(() {
-                    _isLoading = false;
-                  });
-                  
-                  if (result['success']) {
-                    // Create user object from response
-                    final userData = result['data'];
-                    final user = User(
-                      id: userData['id']?.toString(),
-                      username: userData['username'] ?? _emailController.text,
-                      email: userData['email'] ?? _emailController.text,
-                      token: userData['token'],
-                    );
-                    
-                    // Save user to storage
-                    await StorageService.saveUser(user);
-                    
-                    // Update user bloc
-                    UserBloc().setUser(user);
-                    
-                    // Show success message and close the sheet
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Login successful!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                    Navigator.pop(context);
-                    
-                    // TODO: Navigate to main app screen after login
-                    // For now, just pop the modal
-                  } else {
-                    // Show error message
-                    setState(() {
-                      _errorMessage = result['message'];
-                    });
-                  }
-                } catch (e) {
-                  setState(() {
-                    _isLoading = false;
-                    _errorMessage = 'An unexpected error occurred. Please try again.';
-                  });
-                }
-              } : null,
+              onPressed: !_isLoading
+                  ? () async {
+                      // Validate inputs
+                      if (_emailController.text.isEmpty ||
+                          _passwordController.text.isEmpty) {
+                        setState(() {
+                          _errorMessage =
+                              'Please enter email/username and password';
+                        });
+                        return;
+                      }
+
+                      // Clear any previous errors
+                      setState(() {
+                        _errorMessage = null;
+                        _isLoading = true;
+                      });
+
+                      // Call login API
+                      try {
+                        final result = await AuthService.login(
+                          usernameOrEmail: _emailController.text,
+                          password: _passwordController.text,
+                        );
+
+                        setState(() {
+                          _isLoading = false;
+                        });
+
+                        if (result['success']) {
+                          // Create user object from response
+                          final userData = result['data'];
+                          final user = User(
+                            id: userData['id']?.toString(),
+                            username:
+                                userData['username'] ?? _emailController.text,
+                            email: userData['email'] ?? _emailController.text,
+                            token: userData['token'],
+                          );
+
+                          // Save user to storage
+                          await StorageService.saveUser(user);
+
+                          // Update user bloc
+                          UserBloc().setUser(user);
+
+                          // Show success message and close the sheet
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Login successful!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DashboardPage()));
+                          // Navigator.pop(context);
+
+                          // TODO: Navigate to main app screen after login
+                          // For now, just pop the modal
+                        } else {
+                          // Show error message
+                          setState(() {
+                            _errorMessage = result['message'];
+                          });
+                        }
+                      } catch (e) {
+                        setState(() {
+                          _isLoading = false;
+                          _errorMessage =
+                              'An unexpected error occurred. Please try again.';
+                        });
+                      }
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: orangeColor,
                 shape: RoundedRectangleBorder(
@@ -193,17 +204,17 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                 ),
               ),
               child: _isLoading
-                ? CircularProgressIndicator(color: whiteColor)
-                : Text(
-                    'Sign In',
-                    style: whiteTextStyle.copyWith(
-                      fontWeight: semiBold,
-                      fontSize: 16,
+                  ? CircularProgressIndicator(color: whiteColor)
+                  : Text(
+                      'Sign In',
+                      style: whiteTextStyle.copyWith(
+                        fontWeight: semiBold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
             ),
           ),
-          
+
           // OR divider
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20.0),
@@ -233,7 +244,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ],
             ),
           ),
-          
+
           // Google button with same width as Sign In button
           SizedBox(
             width: double.infinity,
@@ -262,7 +273,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ),
             ),
           ),
-          
+
           // Create account link
           Padding(
             padding: const EdgeInsets.only(top: 24.0),
@@ -277,7 +288,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                   onTap: () {
                     // Navigate to register page
                     Navigator.pop(context);
-                    
+
                     // Show the register bottom sheet
                     showModalBottomSheet(
                       context: context,
@@ -304,7 +315,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
               ],
             ),
           ),
-          
+
           // Add extra padding at bottom for keyboard
           const SizedBox(height: 16),
         ],

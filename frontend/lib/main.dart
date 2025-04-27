@@ -1,3 +1,5 @@
+import 'package:frontend/ui/pages/dashboard_page.dart';
+import 'package:frontend/ui/pages/main_page.dart';
 import 'package:frontend/ui/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/blocs/user_bloc.dart';
@@ -40,7 +42,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashPage(),
+      home: const MainPage(),
     );
   }
 }
