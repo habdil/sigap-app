@@ -66,24 +66,35 @@ class DashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Container(
-                    height: 50,
+                    height: 60,
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25)),
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(35)),
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'Your Thoughts...',
+                        hintStyle: greyTextStyle.copyWith(
+                            fontSize: 17, fontWeight: light, height: 1.0),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 14),
+                            horizontal: 35,
+                            vertical:
+                                20 // Sesuaikan nilai vertical untuk menempatkan hint text di tengah
+                            ),
                         suffixIcon: Container(
-                          margin: const EdgeInsets.only(right: 4),
+                          width: 55,
+                          height: 50,
+                          margin: const EdgeInsets.only(right: 5),
                           decoration: BoxDecoration(
-                            color: Color(0xFFFFA726),
-                            shape: BoxShape.circle,
+                              color: Color(0xFFFFA726),
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(26)),
+                          child: Transform.rotate(
+                            angle:
+                                -0.785398, // Rotasi 45 derajat dalam radian (mengarah ke kanan atas)
+                            child: const Icon(Icons.arrow_forward,
+                                color: Colors.white),
                           ),
-                          child: const Icon(Icons.arrow_forward,
-                              color: Colors.white),
                         ),
                       ),
                     ),
@@ -317,15 +328,22 @@ class DashboardPage extends StatelessWidget {
                   ),
                   // Post Image
                   ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(10), bottom: Radius.circular(10)),
-                    child: Image.asset(
-                      'assets/img_running_post.png', // Ganti sesuai file kamu
-                      width: double.infinity,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(10),
+                          bottom: Radius.circular(10)),
+                      child: Padding(
+                          padding: const EdgeInsets.only(left: 15, right: 15),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(12),
+                                bottom: Radius.circular(12)),
+                            child: Image.asset(
+                              'assets/img_running_post.png', // Ganti sesuai file kamu
+                              width: double.infinity,
+                              height: 300,
+                              fit: BoxFit.cover,
+                            ),
+                          ))),
                   const SizedBox(height: 12),
                   // Post Description
                   Padding(
@@ -348,8 +366,11 @@ class DashboardPage extends StatelessWidget {
                         // Like
                         Row(
                           children: [
-                            Icon(Icons.emoji_emotions_outlined,
-                                color: Colors.orange),
+                            Image.asset(
+                              'assets/icn_clap.png',
+                              width: 20, // Sesuaikan ukuran gambar
+                              height: 20,
+                            ),
                             const SizedBox(width: 4),
                             Text('1,100',
                                 style: blackTextStyle.copyWith(fontSize: 12)),
@@ -359,8 +380,11 @@ class DashboardPage extends StatelessWidget {
                         // Comment
                         Row(
                           children: [
-                            Icon(Icons.chat_bubble_outline,
-                                color: Colors.black54),
+                            Image.asset(
+                              'assets/ic_comments.png',
+                              width: 20, // Sesuaikan ukuran gambar
+                              height: 20,
+                            ),
                             const SizedBox(width: 4),
                             Text('58',
                                 style: blackTextStyle.copyWith(fontSize: 12)),
@@ -387,150 +411,7 @@ class DashboardPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            'Give a clap!',
-                            style: blackTextStyle.copyWith(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header user info
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        // Profile Picture
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundImage: AssetImage(
-                              'assets/profile.png'), // Ganti sesuai file kamu
-                        ),
-                        const SizedBox(width: 12),
-                        // Username + Time
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'SIGAP Official',
-                              style: blackTextStyle.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '30 mnt',
-                              style: greyTextStyle.copyWith(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Spacer(),
-                        Icon(Icons.more_horiz),
-                      ],
-                    ),
-                  ),
-                  // Post Image
-                  ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(10), bottom: Radius.circular(10)),
-                    child: Image.asset(
-                      'assets/img_running_post.png', // Ganti sesuai file kamu
-                      width: double.infinity,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Post Description
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Running For 4Hours Today',
-                      style: blackTextStyle.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Reaction Row
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        // Like
-                        Row(
-                          children: [
-                            Icon(Icons.emoji_emotions_outlined,
-                                color: Colors.orange),
-                            const SizedBox(width: 4),
-                            Text('1,100',
-                                style: blackTextStyle.copyWith(fontSize: 12)),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        // Comment
-                        Row(
-                          children: [
-                            Icon(Icons.chat_bubble_outline,
-                                color: Colors.black54),
-                            const SizedBox(width: 4),
-                            Text('58',
-                                style: blackTextStyle.copyWith(fontSize: 12)),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        // Views
-                        Row(
-                          children: [
-                            Icon(Icons.remove_red_eye_outlined,
-                                color: Colors.black54),
-                            const SizedBox(width: 4),
-                            Text('1,300',
-                                style: blackTextStyle.copyWith(fontSize: 12)),
-                          ],
-                        ),
-                        Spacer(),
-                        // Button
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            'Give a clap!',
+                            '👏 Give a clap!',
                             style: blackTextStyle.copyWith(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,

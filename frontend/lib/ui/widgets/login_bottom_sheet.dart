@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/pages/dashboard_page.dart';
+import 'package:frontend/ui/pages/main_page.dart';
 import 'package:frontend/ui/widgets/register_bottom_sheet.dart'; // Import register bottom sheet
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/models/user_model.dart';
@@ -177,7 +178,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DashboardPage()));
+                                  builder: (context) => MainPage()));
                           // Navigator.pop(context);
 
                           // TODO: Navigate to main app screen after login
