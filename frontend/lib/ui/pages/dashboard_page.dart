@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
+import 'package:frontend/ui/pages/chatbot_page.dart';
 import 'package:frontend/ui/widgets/activity.dart';
 import 'package:frontend/ui/widgets/daily_health_article.dart';
 
@@ -66,11 +67,17 @@ class DashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   Container(
-                    height: 60,
+                    height: 58,
                     decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(35)),
                     child: TextField(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ChatBotPage()),
+                          );
+                        },
                       decoration: InputDecoration(
                         hintText: 'Your Thoughts...',
                         hintStyle: greyTextStyle.copyWith(
@@ -79,7 +86,7 @@ class DashboardPage extends StatelessWidget {
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 35,
                             vertical:
-                                20 // Sesuaikan nilai vertical untuk menempatkan hint text di tengah
+                                19 // Sesuaikan nilai vertical untuk menempatkan hint text di tengah
                             ),
                         suffixIcon: Container(
                           width: 55,

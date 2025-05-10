@@ -1,3 +1,4 @@
+import 'package:frontend/ui/pages/chatbot_page.dart';
 import 'package:frontend/ui/pages/dashboard_page.dart';
 import 'package:frontend/ui/pages/main_page.dart';
 import 'package:frontend/ui/pages/splash_page.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashPage(),
+      home: const MainPage(),
     );
   }
 }
