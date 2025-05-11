@@ -38,6 +38,10 @@ func main() {
 	routes.SetupAuthRoutes(router)
 	routes.SetupProfileRoutes(router)
 	routes.SetupAssessmentRoutes(router)
+	routes.SetupActivityRoutes(router) // Tambahkan ini
+	routes.SetupFoodRoutes(router)
+	routes.SetupCoinRoutes(router)
+	routes.SetupChatbotRoutes(router) // Tambahkan ini
 
 	// Add health check endpoint
 	router.GET("/health", func(c *gin.Context) {

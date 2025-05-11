@@ -74,7 +74,7 @@ func (r *AssessmentRepository) CreateRiskAssessmentResult(userID int, assessment
 	// Log the values being inserted
 	log.Printf("Inserting risk assessment with factors: %v and recommendations: %v", riskFactors, recommendations)
 
-	// Convert slices to JSON arrays
+	// Convert slices to JSON objects
 	riskFactorsJSON, err := json.Marshal(riskFactors)
 	if err != nil {
 		log.Printf("Error marshaling risk factors to JSON: %v", err)
@@ -87,7 +87,7 @@ func (r *AssessmentRepository) CreateRiskAssessmentResult(userID int, assessment
 		return nil, err
 	}
 
-	// Use query with JSONB cast
+	// Use query with explicit JSONB cast
 	query := `
     INSERT INTO risk_assessment_results (user_id, assessment_id, risk_percentage, risk_factors, recommendations)
     VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
@@ -104,15 +104,15 @@ func (r *AssessmentRepository) CreateRiskAssessmentResult(userID int, assessment
 
 	var createdAt time.Time
 
-	// Execute the query with JSON string values
+	// Execute the query with JSON strings
 	err = config.DBPool.QueryRow(
 		context.Background(),
 		query,
 		userID,
 		assessmentID,
 		riskPercentage,
-		string(riskFactorsJSON),     // Pass as a JSON string with explicit cast to jsonb
-		string(recommendationsJSON), // Pass as a JSON string with explicit cast to jsonb
+		string(riskFactorsJSON),     // Convert []byte to string with explicit JSONB cast in query
+		string(recommendationsJSON), // Convert []byte to string with explicit JSONB cast in query
 	).Scan(&result.ID, &createdAt)
 
 	if err != nil {
@@ -194,15 +194,15 @@ func (r *AssessmentRepository) GetLatestAssessmentResult(userID int) (*models.Ri
 
 	var result models.RiskAssessmentResult
 	var createdAt time.Time
-	var riskFactors, recommendations pgtype.Array[string]
+	var riskFactorsJSON, recommendationsJSON []byte
 
 	err := config.DBPool.QueryRow(context.Background(), query, userID).Scan(
 		&result.ID,
 		&result.UserID,
 		&result.AssessmentID,
 		&result.RiskPercentage,
-		&riskFactors,
-		&recommendations,
+		&riskFactorsJSON,
+		&recommendationsJSON,
 		&createdAt,
 	)
 
@@ -215,15 +215,16 @@ func (r *AssessmentRepository) GetLatestAssessmentResult(userID int) (*models.Ri
 
 	result.CreatedAt = createdAt
 
-	// Convert arrays
-	result.RiskFactors = make([]string, len(riskFactors.Elements))
-	for i, rf := range riskFactors.Elements {
-		result.RiskFactors[i] = rf
+	// Parse JSON data untuk risk factors
+	if err := json.Unmarshal(riskFactorsJSON, &result.RiskFactors); err != nil {
+		log.Printf("Error unmarshaling risk factors: %v", err)
+		result.RiskFactors = []string{"Error parsing risk factors"}
 	}
 
-	result.Recommendations = make([]string, len(recommendations.Elements))
-	for i, rec := range recommendations.Elements {
-		result.Recommendations[i] = rec
+	// Parse JSON data untuk recommendations
+	if err := json.Unmarshal(recommendationsJSON, &result.Recommendations); err != nil {
+		log.Printf("Error unmarshaling recommendations: %v", err)
+		result.Recommendations = []string{"Error parsing recommendations"}
 	}
 
 	return &result, nil
@@ -287,7 +288,7 @@ func (r *AssessmentRepository) GetAssessmentHistory(userID int) ([]models.Assess
 		var assessmentCreatedAt, assessmentUpdatedAt, resultCreatedAt pgtype.Timestamp
 		var resultID, assessmentID pgtype.Int4
 		var riskPercentage pgtype.Int4
-		var riskFactors, recommendations pgtype.Array[string]
+		var riskFactorsJSON, recommendationsJSON []byte
 
 		err := rows.Scan(
 			&assessment.ID,
@@ -301,8 +302,8 @@ func (r *AssessmentRepository) GetAssessmentHistory(userID int) ([]models.Assess
 			&resultID,
 			&assessmentID,
 			&riskPercentage,
-			&riskFactors,
-			&recommendations,
+			&riskFactorsJSON,
+			&recommendationsJSON,
 			&resultCreatedAt,
 		)
 		if err != nil {
@@ -326,16 +327,20 @@ func (r *AssessmentRepository) GetAssessmentHistory(userID int) ([]models.Assess
 				result.RiskPercentage = int(riskPercentage.Int32)
 			}
 
-			// Convert arrays
-			result.RiskFactors = make([]string, len(riskFactors.Elements))
-			for i, rf := range riskFactors.Elements {
-				result.RiskFactors[i] = rf
+			// Parse JSON data
+			var riskFactors []string
+			if err := json.Unmarshal(riskFactorsJSON, &riskFactors); err != nil {
+				log.Printf("Error unmarshaling risk factors: %v", err)
+				riskFactors = []string{"Error parsing risk factors"}
 			}
+			result.RiskFactors = riskFactors
 
-			result.Recommendations = make([]string, len(recommendations.Elements))
-			for i, rec := range recommendations.Elements {
-				result.Recommendations[i] = rec
+			var recommendations []string
+			if err := json.Unmarshal(recommendationsJSON, &recommendations); err != nil {
+				log.Printf("Error unmarshaling recommendations: %v", err)
+				recommendations = []string{"Error parsing recommendations"}
 			}
+			result.Recommendations = recommendations
 
 			if resultCreatedAt.Valid {
 				result.CreatedAt = resultCreatedAt.Time

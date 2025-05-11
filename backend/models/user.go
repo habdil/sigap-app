@@ -6,19 +6,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User represents the user model
 type User struct {
-	ID           int       `json:"id"`
-	Username     string    `json:"username"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"-"` // "-" means this field won't be included in JSON responses
-	Password     string    `json:"password,omitempty"`
-	GoogleID     string    `json:"google_id,omitempty"`
-	Age          int       `json:"age,omitempty"`
-	Height       float64   `json:"height,omitempty"`
-	Weight       float64   `json:"weight,omitempty"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID                int       `json:"id"`
+	Username          string    `json:"username"`
+	Email             string    `json:"email"`
+	PasswordHash      string    `json:"-"` // "-" means this field won't be included in JSON responses
+	Password          string    `json:"password,omitempty"`
+	FullName          string    `json:"full_name,omitempty"`
+	DateOfBirth       time.Time `json:"date_of_birth,omitempty"`
+	Gender            string    `json:"gender,omitempty"`
+	Role              string    `json:"role,omitempty"`
+	ProfilePictureURL string    `json:"profile_picture_url,omitempty"`
+	IsVerified        bool      `json:"is_verified,omitempty"`
+	OAuthProvider     string    `json:"oauth_provider,omitempty"`
+	OAuthID           string    `json:"oauth_id,omitempty"`
+	GoogleID          string    `json:"google_id,omitempty"`
+	Age               int       `json:"age,omitempty"`
+	Height            float64   `json:"height,omitempty"`
+	Weight            float64   `json:"weight,omitempty"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
+	LastLogin         time.Time `json:"last_login,omitempty"`
 }
 
 // HashPassword takes a plain text password and hashes it
