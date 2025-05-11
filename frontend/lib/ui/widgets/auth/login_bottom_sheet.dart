@@ -1,42 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/shared/notification.dart';
 import 'package:frontend/shared/theme.dart';
-import 'package:frontend/ui/widgets/login_bottom_sheet.dart'; // Import login bottom sheet
+import 'package:frontend/ui/pages/profile/profile_setup_page.dart';
+import 'package:frontend/ui/widgets/auth/register_bottom_sheet.dart'; // Import register bottom sheet
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/models/user_model.dart';
+import 'package:frontend/blocs/user_bloc.dart';
+import 'package:frontend/services/storage_service.dart';
 
-class RegisterBottomSheet extends StatefulWidget {
-  const RegisterBottomSheet({Key? key}) : super(key: key);
+class LoginBottomSheet extends StatefulWidget {
+  const LoginBottomSheet({Key? key}) : super(key: key);
 
   @override
-  State<RegisterBottomSheet> createState() => _RegisterBottomSheetState();
+  State<LoginBottomSheet> createState() => _LoginBottomSheetState();
 }
 
-class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
-  final TextEditingController _usernameController = TextEditingController();
+class _LoginBottomSheetState extends State<LoginBottomSheet> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  bool _privacyPolicyChecked = false;
   bool _isLoading = false;
   String? _errorMessage;
 
   @override
   void dispose() {
-    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.all(24),
+@override
+Widget build(BuildContext context) {
+  return Container(
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    padding: const EdgeInsets.all(24),
+    // Tambahkan SingleChildScrollView di sini untuk membuat konten bisa di-scroll
+    child: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -54,9 +55,9 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
             ),
           ),
           
-          // Create Account text - aligned left with bigger font
+          // Welcome back text - now aligned left with bigger font
           Text(
-            'Create\nAccount',
+            'Welcome\nBack User!',
             style: blackTextStyle.copyWith(
               fontSize: 32,
               fontWeight: extraBold,
@@ -65,27 +66,11 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
           ),
           const SizedBox(height: 32),
           
-          // Username Field
-          TextField(
-            controller: _usernameController,
-            decoration: InputDecoration(
-              hintText: 'Enter Username',
-              hintStyle: greyTextStyle,
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: greyColor),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: blueColor),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          
-          // Email Field
+          // Email/Username Field
           TextField(
             controller: _emailController,
             decoration: InputDecoration(
-              hintText: 'Enter Email',
+              hintText: 'Enter Email/Username',
               hintStyle: greyTextStyle,
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: greyColor),
@@ -112,24 +97,7 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          
-          // Confirm Password Field
-          TextField(
-            controller: _confirmPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: 'Confirm Password',
-              hintStyle: greyTextStyle,
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: greyColor),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: blueColor),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 36),
           
           // Error message display
           if (_errorMessage != null)
@@ -151,55 +119,16 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
               ),
             ),
           
-          // Privacy Policy Checkbox
-          Row(
-            children: [
-              Checkbox(
-                value: _privacyPolicyChecked,
-                onChanged: (value) {
-                  setState(() {
-                    _privacyPolicyChecked = value ?? false;
-                  });
-                },
-                activeColor: orangeColor,
-              ),
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    text: 'By continuing, you agree to our ',
-                    style: greyTextStyle.copyWith(fontSize: 12),
-                    children: [
-                      TextSpan(
-                        text: 'Privacy Policy',
-                        style: blackTextStyle.copyWith(
-                          fontSize: 12,
-                          fontWeight: medium,
-                          color: orangeColor,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '.',
-                        style: greyTextStyle.copyWith(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Register Button
+          // Sign In Button
           SizedBox(
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: (_privacyPolicyChecked && !_isLoading) ? () async {
-                // Validate passwords match
-                if (_passwordController.text != _confirmPasswordController.text) {
+              onPressed: !_isLoading ? () async {
+                // Validate inputs
+                if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
                   setState(() {
-                    _errorMessage = 'Passwords do not match';
+                    _errorMessage = 'Please enter email/username and password';
                   });
                   return;
                 }
@@ -210,11 +139,10 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                   _isLoading = true;
                 });
                 
-                // Call signup API
+                // Call login API
                 try {
-                  final result = await AuthService.signup(
-                    username: _usernameController.text,
-                    email: _emailController.text,
+                  final result = await AuthService.login(
+                    usernameOrEmail: _emailController.text,
                     password: _passwordController.text,
                   );
                   
@@ -223,34 +151,39 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                   });
                   
                   if (result['success']) {
-                    // Show success message and close the sheet
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Registration successful! You can now login.'),
-                        backgroundColor: Colors.green,
-                      ),
+                    // Create user object from response
+                    final userData = result['data'];
+                    final user = User(
+                      id: userData['id']?.toString(),
+                      username: userData['username'] ?? _emailController.text,
+                      email: userData['email'] ?? _emailController.text,
+                      token: userData['token'],
                     );
-                    Navigator.pop(context);
                     
-                    // Show login sheet
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) {
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom,
-                          ),
-                          child: const LoginBottomSheet(),
-                        );
-                      },
+                    // Save user to storage
+                    await StorageService.saveUser(user);
+                    
+                    // Update user bloc
+                    UserBloc().setUser(user);
+                    
+                    // Show success notification
+                    context.showSuccessNotification(
+                      title: "Login Success!",
+                      message: "Welcome user, your account and password are correct",
+                    );
+                    
+                    Navigator.pop(context);
+                                    
+                    // Navigate to personalization page after login
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => const ProfileSetupPage()),
                     );
                   } else {
                     // Show error message
-                    setState(() {
-                      _errorMessage = result['message'];
-                    });
+                    context.showErrorNotification(
+                      title: "Login Failed!",
+                      message: result['message'] ?? "Your username or password is incorrect, please try again!",
+                    );
                   }
                 } catch (e) {
                   setState(() {
@@ -260,7 +193,7 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                 }
               } : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: _privacyPolicyChecked ? orangeColor : Colors.grey,
+                backgroundColor: orangeColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -268,7 +201,7 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
               child: _isLoading
                 ? CircularProgressIndicator(color: whiteColor)
                 : Text(
-                    'Create Account',
+                    'Sign In',
                     style: whiteTextStyle.copyWith(
                       fontWeight: semiBold,
                       fontSize: 16,
@@ -307,13 +240,13 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
             ),
           ),
           
-          // Google button with same width as Register button
+          // Google button with same width as Sign In button
           SizedBox(
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Implement Google registration
+                // TODO: Implement Google login
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -336,22 +269,22 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
             ),
           ),
           
-          // Sign In link
+          // Create account link
           Padding(
             padding: const EdgeInsets.only(top: 24.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Already have an account? ",
+                  "Don't have an account? ",
                   style: greyTextStyle.copyWith(fontSize: 14),
                 ),
                 GestureDetector(
                   onTap: () {
-                    // Navigate to login page
+                    // Navigate to register page
                     Navigator.pop(context);
                     
-                    // Show the login bottom sheet
+                    // Show the register bottom sheet
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
@@ -361,13 +294,13 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                           padding: EdgeInsets.only(
                             bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),
-                          child: const LoginBottomSheet(),
+                          child: const RegisterBottomSheet(),
                         );
                       },
                     );
                   },
                   child: Text(
-                    'Sign In',
+                    'Create account',
                     style: blackTextStyle.copyWith(
                       fontSize: 14,
                       fontWeight: bold,
@@ -382,6 +315,7 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
           const SizedBox(height: 16),
         ],
       ),
+     ),
     );
   }
 }

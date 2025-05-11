@@ -1,0 +1,67 @@
+Directory Structure for: E:\Lomba\GSC\sigap-app\frontend
+Scanned on: 2025-05-11 23:00:46
+==================================================
+
+📁 assets/
+    📄 bg_personalize.png (2.1 MB)
+    📄 ic_badminton.png (1.1 KB)
+    📄 ic_comments.png (247.0 B)
+    📄 ic_google.png (2.9 KB)
+    📄 ic_jogging.png (1.1 KB)
+    📄 ic_logo_orange.png (5.5 KB)
+    📄 ic_logo_white.png (2.2 KB)
+    📄 ic_onboarding_1.png (6.5 KB)
+    📄 ic_onboarding_2.png (6.0 KB)
+    📄 ic_onboarding_3.png (10.2 KB)
+    📄 ic_onboarding_4.png (5.4 KB)
+    📄 ic_running.png (1.1 KB)
+    📄 ic_yoga.png (1.1 KB)
+    📄 icn_clap.png (847.0 B)
+    📄 icn_eat.png (565.0 B)
+    📄 icn_home_active.png (309.0 B)
+    📄 icn_run.png (546.0 B)
+    📄 icn_user.png (579.0 B)
+    📄 img_orangLari.png (128.8 KB)
+    📄 img_running_post.png (185.0 KB)
+    📄 img_salad.png (154.3 KB)
+    📄 img_sick.png (31.6 KB)
+    📄 img_sigap_letsGetStarted.png (18.0 KB)
+📁 lib/
+    📁 blocs/
+        📄 user_bloc.dart (873.0 B)
+    📁 models/
+        📄 user_model.dart (573.0 B)
+        📄 user_profile_model.dart (820.0 B)
+    📁 services/
+        📄 auth_service.dart (6.6 KB)
+        📄 storage_service.dart (1.2 KB)
+    📁 shared/
+        📄 notification.dart (4.9 KB)
+        📄 theme.dart (1.1 KB)
+    📁 ui/
+        📁 pages/
+            📄 dashboard_page.dart (19.4 KB)
+            📄 home_page.dart (8.2 KB)
+            📄 main_page.dart (1.5 KB)
+            📄 onboarding_page.dart (10.3 KB)
+            📄 personalize_page.dart (6.2 KB)
+            📄 splash_page.dart (1.1 KB)
+        📁 widgets/
+            📄 action_button.dart (1.9 KB)
+            📄 activity.dart (4.3 KB)
+            📄 daily_health_article.dart (3.1 KB)
+            📄 gradient_background.dart (598.0 B)
+            📄 login_bottom_sheet.dart (11.3 KB)
+            📄 personalize_input_card.dart (4.4 KB)
+            📄 register_bottom_sheet.dart (13.5 KB)
+    📄 main.dart (1.3 KB)
+📄 .flutter-plugins (1.3 KB)
+📄 .flutter-plugins-dependencies (3.4 KB)
+📄 .gitignore (734.0 B)
+📄 .metadata (1.7 KB)
+📄 analysis_options.yaml (1.4 KB)
+📄 file_structure.py (3.7 KB)
+📄 frontend.iml (859.0 B)
+📄 pubspec.lock (12.0 KB)
+📄 pubspec.yaml (3.9 KB)
+📄 README.md (567.0 B)

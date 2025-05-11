@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   // Base URL of your API
-  static const String baseUrl = 'http://192.168.170.136:3000/api/auth';
+  static const String baseUrl = 'http://localhost:3000/api/auth'; // Replace with your actual API URL
   
   // Signup method
   static Future<Map<String, dynamic>> signup({

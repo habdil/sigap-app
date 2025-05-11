@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
-import 'package:frontend/ui/widgets/login_bottom_sheet.dart';
-import 'package:frontend/ui/widgets/register_bottom_sheet.dart'; // Import the register bottom sheet
+import 'package:frontend/ui/widgets/auth/login_bottom_sheet.dart';
+import 'package:frontend/ui/widgets/auth/register_bottom_sheet.dart'; // Import the register bottom sheet
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

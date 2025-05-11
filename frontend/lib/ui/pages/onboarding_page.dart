@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
-import 'package:frontend/ui/pages/home_page.dart';
+import 'package:frontend/ui/pages/auth/home_page.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
