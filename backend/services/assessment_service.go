@@ -531,3 +531,21 @@ func getDietDescription(quality int) string {
 		return "unknown"
 	}
 }
+
+// CheckAssessmentStatus mengecek apakah user perlu mengisi assessment baru
+func (s *AssessmentService) CheckAssessmentStatus(userID int) (bool, error) {
+	// Coba dapatkan assessment terakhir user
+	_, err := s.assessmentRepo.GetLatestAssessment(userID)
+
+	// Jika error karena tidak ada assessment, user perlu mengisi assessment baru
+	if err != nil {
+		if strings.Contains(err.Error(), "no assessment found for this user") {
+			return true, nil // true = perlu assessment baru
+		}
+		// Jika error lain, kembalikan error tersebut
+		return false, err
+	}
+
+	// User sudah punya assessment yang masih valid
+	return false, nil // false = tidak perlu assessment baru
+}

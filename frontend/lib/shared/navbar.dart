@@ -9,9 +9,9 @@ class CustomNavBar extends StatefulWidget {
   final int initialIndex;
 
   const CustomNavBar({
-    Key? key,
+    super.key,
     this.initialIndex = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomNavBar> createState() => _CustomNavBarState();
@@ -85,16 +85,16 @@ class _CustomNavBarState extends State<CustomNavBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem(0, 'assets/icn_home_active.png', 'Home'),
-          _buildNavItem(1, 'assets/icn_run.png', 'Activities'),
-          _buildNavItem(2, 'assets/icn_eat.png', 'Diet'),
-          _buildNavItem(3, 'assets/icn_user.png', 'Profile'),
+          _buildNavItem(0, 'assets/icn_home_active.png'),
+          _buildNavItem(1, 'assets/icn_run.png'),
+          _buildNavItem(2, 'assets/icn_eat.png'),
+          _buildNavItem(3, 'assets/icn_user.png'),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(int index, String iconPath, String label) {
+  Widget _buildNavItem(int index, String iconPath) {
     final bool isSelected = _selectedIndex == index;
 
     return GestureDetector(
@@ -118,13 +118,7 @@ class _CustomNavBarState extends State<CustomNavBar> {
               ),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: isSelected 
-                ? orangeTextStyle.copyWith(fontSize: 12, fontWeight: medium)
-                : greyTextStyle.copyWith(fontSize: 12),
-          ),
+          const SizedBox(height: 6),
         ],
       ),
     );

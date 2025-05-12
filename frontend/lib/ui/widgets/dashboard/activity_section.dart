@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/widgets/dashboard/activity.dart';
+import 'package:frontend/ui/pages/dashboard/sport/sport_page.dart'; // Import sport page
 
 class ActivitySection extends StatelessWidget {
   final VoidCallback onSeeAllTapped;
 
   const ActivitySection({
-    Key? key,
+    super.key,
     required this.onSeeAllTapped,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,13 @@ class ActivitySection extends StatelessWidget {
                 style: blackTextStyle.copyWith(fontWeight: semiBold, fontSize: 14),
               ),
               GestureDetector(
-                onTap: onSeeAllTapped,
+                onTap: () {
+                  // Navigate to SportPage when "see all" is tapped
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SportPage()),
+                  );
+                },
                 child: Text(
                   'see all',
                   style: orangeTextStyle.copyWith(fontSize: 12, fontWeight: medium),
@@ -47,16 +54,16 @@ class ActivitySection extends StatelessWidget {
               itemCount: activities.length),
         ),
         // Horizontal Scroll for Activity Cards
-        Padding(
-          padding: const EdgeInsets.only(
+        const Padding(
+          padding: EdgeInsets.only(
             left: 16,
             top: 16,
           ),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 5),
+            padding: EdgeInsets.only(bottom: 5),
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: const [
+              children: [
                 ActivityCard(
                   title: 'Morning Jogging',
                   description:
@@ -67,7 +74,7 @@ class ActivitySection extends StatelessWidget {
                 ActivityCard(
                   title: 'Evening Yoga',
                   description:
-                      "Relax your body and mind after a long day of activities. Don't miss this easy way to stay healthy.",
+                      "Relax your body and mind after a long day of activities. An easy way to stay healthy.",
                   badgeText: '+1 Point/Session',
                 ),
                 SizedBox(width: 16),

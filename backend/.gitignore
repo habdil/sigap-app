@@ -1,2 +1,5 @@
-.env
 file_structure.py
+# .gitignore
+main
+*.exe
+.env

@@ -1,0 +1,59 @@
+Directory Structure for: E:\Lomba\GSC\sigap-app\backend
+Scanned on: 2025-05-13 01:01:25
+==================================================
+
+📁 config/
+    📄 corsConfig.go (597.0 B)
+    📄 database.go (1.8 KB)
+📁 controllers/
+    📄 activity.go (2.5 KB)
+    📄 assessment.go (3.2 KB)
+    📄 auth.go (3.2 KB)
+    📄 chatbot_controller.go (5.6 KB)
+    📄 coin_controller.go (3.3 KB)
+    📄 food.go (2.5 KB)
+    📄 profile.go (1.9 KB)
+📁 middlewares/
+    📄 auth_middleware.go (1.2 KB)
+📁 models/
+    📄 activity.go (2.2 KB)
+    📄 assessment.go (1.7 KB)
+    📄 chatbot.go (1.7 KB)
+    📄 coin.go (1.4 KB)
+    📄 food.go (1.7 KB)
+    📄 health_profile.go (874.0 B)
+    📄 user.go (3.4 KB)
+📁 repository/
+    📄 activity_repository.go (6.6 KB)
+    📄 assessment.go (9.1 KB)
+    📄 chatbot_repository.go (8.0 KB)
+    📄 coin_repository.go (5.4 KB)
+    📄 food_repository.go (8.5 KB)
+    📄 health_profile.go (2.1 KB)
+    📄 user.go (9.6 KB)
+📁 routes/
+    📄 activity_routes.go (693.0 B)
+    📄 assessment_routes.go (766.0 B)
+    📄 auth_routes.go (767.0 B)
+    📄 chatbot_routes.go (992.0 B)
+    📄 coin_routes.go (674.0 B)
+    📄 food_routes.go (601.0 B)
+    📄 profile_routes.go (568.0 B)
+📁 services/
+    📄 activity_service.go (7.4 KB)
+    📄 assessment_service.go (15.8 KB)
+    📄 auth_service.go (4.9 KB)
+    📄 chatbot_service.go (9.8 KB)
+    📄 coin_service.go (1.3 KB)
+    📄 food_service.go (8.0 KB)
+    📄 health_profile_service.go (915.0 B)
+📁 test/
+📁 utils/
+    📄 jwt.go (2.0 KB)
+📄 .env (322.0 B)
+📄 .gitignore (25.0 B)
+📄 file_structure.py (3.6 KB)
+📄 go.mod (1.7 KB)
+📄 go.sum (9.6 KB)
+📄 main (19.1 MB)
+📄 main.go (1.4 KB)

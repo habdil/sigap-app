@@ -20,6 +20,7 @@ type User struct {
 	IsVerified        bool      `json:"is_verified,omitempty"`
 	OAuthProvider     string    `json:"oauth_provider,omitempty"`
 	OAuthID           string    `json:"oauth_id,omitempty"`
+	SupabaseUUID      string    `json:"supabase_uuid,omitempty"` // Tambahkan ini
 	GoogleID          string    `json:"google_id,omitempty"`
 	Age               int       `json:"age,omitempty"`
 	Height            float64   `json:"height,omitempty"`
@@ -77,4 +78,13 @@ type ProfileUpdateRequest struct {
 	Age    int     `json:"age" binding:"required"`
 	Height float64 `json:"height" binding:"required"`
 	Weight float64 `json:"weight" binding:"required"`
+}
+
+// SupabaseAuthRequest untuk login/register dengan Supabase
+type SupabaseAuthRequest struct {
+	SupabaseUUID string `json:"supabase_uuid" binding:"required"`
+	Email        string `json:"email" binding:"required,email"`
+	Username     string `json:"username" binding:"required"`
+	GoogleID     string `json:"google_id,omitempty"`
+	AvatarURL    string `json:"avatar_url,omitempty"`
 }

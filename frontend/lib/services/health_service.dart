@@ -4,7 +4,64 @@ import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/models/health_assessment_model.dart';
 
 class HealthService {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'http://192.168.1.17:3000/api';
+  
+  // Method baru untuk mengecek status assessment
+  static Future<Map<String, dynamic>> checkAssessmentStatus() async {
+    try {
+      final user = await StorageService.getUser();
+      if (user == null || user.token == null) {
+        return {
+          'success': false,
+          'message': 'User not authenticated',
+          'needsAssessment': true, // Default ke true jika user belum login
+        };
+      }
+
+      final client = http.Client();
+      try {
+        final response = await client.get(
+          Uri.parse('$baseUrl/assessment/status'),
+          headers: {
+            'Authorization': 'Bearer ${user.token}',
+          },
+        ).timeout(const Duration(seconds: 10));
+
+        print('Check assessment status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+          return {
+            'success': true,
+            'needsAssessment': responseData['needs_assessment'] ?? true,
+          };
+        } else {
+          Map<String, dynamic> errorData = {};
+          try {
+            errorData = jsonDecode(response.body);
+          } catch (e) {
+            // Ignore JSON decode errors
+          }
+          
+          return {
+            'success': false,
+            'message': errorData['error'] ?? 'Failed to check assessment status',
+            'needsAssessment': true, // Default ke true jika ada error
+          };
+        }
+      } finally {
+        client.close();
+      }
+    } catch (e) {
+      print('Check assessment status error: $e');
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+        'needsAssessment': true, // Default ke true jika ada error
+      };
+    }
+  }
   
   static Future<Map<String, dynamic>> submitAssessment(HealthAssessment assessment) async {
     try {
@@ -73,7 +130,7 @@ class HealthService {
       final client = http.Client();
       try {
         final response = await client.get(
-          Uri.parse('$baseUrl/assessment/result'),
+          Uri.parse('$baseUrl/assessment/latest'),  // Perhatikan endpoint yang benar: /latest, bukan /result
           headers: {
             'Authorization': 'Bearer ${user.token}',
           },

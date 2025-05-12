@@ -306,3 +306,104 @@ func (r *UserRepository) IsUsernameTaken(username string) (bool, error) {
 
 	return exists, nil
 }
+
+// GetUserBySupabaseUUID mengambil pengguna berdasarkan Supabase UUID
+func (r *UserRepository) GetUserBySupabaseUUID(supabaseUUID string) (*models.User, error) {
+	user := &models.User{}
+	query := `
+    SELECT id, username, email, google_id, age, height, weight, created_at, updated_at, supabase_uuid
+    FROM users 
+    WHERE supabase_uuid = $1
+    `
+
+	var ageNull pgtype.Int4
+	var heightNull, weightNull pgtype.Float8
+	var googleIDNull, supabaseUUIDNull pgtype.Text
+
+	err := config.DBPool.QueryRow(context.Background(), query, supabaseUUID).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&googleIDNull,
+		&ageNull,
+		&heightNull,
+		&weightNull,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&supabaseUUIDNull,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+
+	if googleIDNull.Valid {
+		user.GoogleID = googleIDNull.String
+	}
+	if supabaseUUIDNull.Valid {
+		user.SupabaseUUID = supabaseUUIDNull.String
+	}
+	if ageNull.Valid {
+		user.Age = int(ageNull.Int32)
+	}
+	if heightNull.Valid {
+		user.Height = heightNull.Float64
+	}
+	if weightNull.Valid {
+		user.Weight = weightNull.Float64
+	}
+
+	return user, nil
+}
+
+// CreateUserWithSupabase membuat pengguna baru menggunakan auth Supabase
+func (r *UserRepository) CreateUserWithSupabase(user *models.User) error {
+	query := `
+    INSERT INTO users (username, email, supabase_uuid, google_id, password_hash)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING id, created_at, updated_at
+    `
+
+	// Jika tidak ada password (login Google), set password_hash kosong
+	if user.PasswordHash == "" {
+		user.PasswordHash = ""
+	}
+
+	err := config.DBPool.QueryRow(
+		context.Background(),
+		query,
+		user.Username,
+		user.Email,
+		user.SupabaseUUID,
+		user.GoogleID,
+		user.PasswordHash,
+	).Scan(&user.ID, &user.CreatedAt, &user.UpdatedAt)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateUserSupabaseInfo memperbarui informasi Supabase dan Google untuk user yang sudah ada
+func (r *UserRepository) UpdateUserSupabaseInfo(userID int, supabaseUUID, googleID string) error {
+	query := `
+    UPDATE users 
+    SET supabase_uuid = $1, google_id = $2, updated_at = NOW()
+    WHERE id = $3
+    `
+
+	_, err := config.DBPool.Exec(
+		context.Background(),
+		query,
+		supabaseUUID,
+		googleID,
+		userID,
+	)
+
+	return err
+}

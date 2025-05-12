@@ -9,10 +9,10 @@ class HealthRiskCard extends StatelessWidget {
   final Map<String, dynamic>? assessmentResult;
 
   const HealthRiskCard({
-    Key? key,
+    super.key,
     required this.isLoading,
     this.assessmentResult,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +113,7 @@ class HealthRiskCard extends StatelessWidget {
       riskColor = Colors.green;
       riskLevel = 'Low Risk';
     } else if (riskPercentage < 70) {
-      riskColor = Colors.orange;
+      riskColor = const Color.fromARGB(255, 151, 91, 0);
       riskLevel = 'Medium Risk';
     } else {
       riskColor = Colors.red;

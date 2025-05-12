@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/supabase_auth_service.dart';
 import 'package:frontend/shared/notification.dart';
 import 'package:frontend/shared/theme.dart';
-import 'package:frontend/ui/pages/profile/profile_setup_page.dart';
+import 'package:frontend/ui/widgets/auth/auth_redirector.dart';
 import 'package:frontend/ui/widgets/auth/register_bottom_sheet.dart'; // Import register bottom sheet
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/models/user_model.dart';
@@ -9,7 +10,7 @@ import 'package:frontend/blocs/user_bloc.dart';
 import 'package:frontend/services/storage_service.dart';
 
 class LoginBottomSheet extends StatefulWidget {
-  const LoginBottomSheet({Key? key}) : super(key: key);
+  const LoginBottomSheet({super.key});
 
   @override
   State<LoginBottomSheet> createState() => _LoginBottomSheetState();
@@ -20,6 +21,7 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true; // Tambahkan variabel untuk mengontrol visibilitas password
 
   @override
   void dispose() {
@@ -27,6 +29,41 @@ class _LoginBottomSheetState extends State<LoginBottomSheet> {
     _passwordController.dispose();
     super.dispose();
   }
+
+Future<void> _signInWithGoogle() async {
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
+  
+  try {
+    final authService = SupabaseAuthService();
+    final success = await authService.handleGoogleSignIn(context);
+    
+    if (!mounted) return; // Tambahkan pengecekan ini untuk menghindari setState pada widget yang tidak mounted
+    
+    setState(() {
+      _isLoading = false;
+    });
+    
+    if (success) {
+      // Close bottom sheet
+      if (!mounted) return;
+      Navigator.pop(context);
+                
+      // Navigate to the redirect page
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AuthRedirector()),
+      );
+    }
+  } catch (e) {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _errorMessage = 'Terjadi kesalahan saat login dengan Google: ${e.toString()}';
+    });
+  }
+}
 
 @override
 Widget build(BuildContext context) {
@@ -82,10 +119,10 @@ Widget build(BuildContext context) {
           ),
           const SizedBox(height: 24),
           
-          // Password Field
+          // Password Field dengan toggle visibility
           TextField(
             controller: _passwordController,
-            obscureText: true,
+            obscureText: _obscurePassword,
             decoration: InputDecoration(
               hintText: 'Enter Password',
               hintStyle: greyTextStyle,
@@ -94,6 +131,18 @@ Widget build(BuildContext context) {
               ),
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: blueColor),
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  // Ganti ikon berdasarkan status _obscurePassword
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: greyColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
               ),
             ),
           ),
@@ -141,55 +190,105 @@ Widget build(BuildContext context) {
                 
                 // Call login API
                 try {
+                  setState(() {
+                    _errorMessage = null;
+                    _isLoading = true;
+                  });
+                  
                   final result = await AuthService.login(
                     usernameOrEmail: _emailController.text,
                     password: _passwordController.text,
                   );
+                  
+                  if (!mounted) return;
                   
                   setState(() {
                     _isLoading = false;
                   });
                   
                   if (result['success']) {
-                    // Create user object from response
-                    final userData = result['data'];
-                    final user = User(
-                      id: userData['id']?.toString(),
-                      username: userData['username'] ?? _emailController.text,
-                      email: userData['email'] ?? _emailController.text,
-                      token: userData['token'],
-                    );
-                    
-                    // Save user to storage
-                    await StorageService.saveUser(user);
-                    
-                    // Update user bloc
-                    UserBloc().setUser(user);
-                    
-                    // Show success notification
-                    context.showSuccessNotification(
-                      title: "Login Success!",
-                      message: "Welcome user, your account and password are correct",
-                    );
-                    
-                    Navigator.pop(context);
-                                    
-                    // Navigate to personalization page after login
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => const ProfileSetupPage()),
-                    );
+                    try {
+                      // Create user object from response with proper null safety
+                      final userData = result['data'];
+                      
+                      // Validasi data yang diterima
+                      if (userData == null) {
+                        throw Exception("Invalid response data: userData is null");
+                      }
+                      
+                      // Error will occur here if any keys are missing or null
+                      print('User data from response: $userData');
+                      
+                      final user = User(
+                        id: (userData['id'] ?? '0').toString(), // Gunakan null safety
+                        username: userData['username'] ?? _emailController.text,
+                        email: userData['email'] ?? _emailController.text,
+                        token: userData['token'] as String?, // Cast sebagai nullable String
+                      );
+                      
+                      // Validasi token
+                      if (user.token == null || user.token!.isEmpty) {
+                        throw Exception("Invalid token received from server");
+                      }
+                      
+                      // Save user to storage
+                      await StorageService.saveUser(user);
+                      await StorageService.saveToken(user.token!);
+                      
+                      // Update user bloc
+                      UserBloc().setUser(user);
+                      
+                      if (!mounted) return;
+                      
+                      // Show success notification
+                      context.showSuccessNotification(
+                        title: "Login Success!",
+                        message: "Welcome ${user.username}, your account and password are correct",
+                      );
+                      
+                      // Close bottom sheet and navigate
+                      Navigator.pop(context);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => const AuthRedirector()),
+                      );
+                    } catch (dataError) {
+                      // Tangkap error saat mengolah data respons
+                      print('Error processing response data: $dataError');
+                      setState(() {
+                        _errorMessage = 'Error processing server response: ${dataError.toString()}';
+                      });
+                      
+                      context.showErrorNotification(
+                        title: "Login Error!",
+                        message: "There was a problem with the server response. Please try again.",
+                      );
+                    }
                   } else {
-                    // Show error message
+                    // Show error message from response
+                    setState(() {
+                      _errorMessage = result['message'] ?? "Your username or password is incorrect, please try again!";
+                    });
+                    
                     context.showErrorNotification(
                       title: "Login Failed!",
-                      message: result['message'] ?? "Your username or password is incorrect, please try again!",
+                      message: _errorMessage!,
                     );
                   }
                 } catch (e) {
+                  // Tangkap error saat melakukan login request
+                  print('Login request error: $e');
+                  
+                  if (!mounted) return;
+                  
                   setState(() {
                     _isLoading = false;
-                    _errorMessage = 'An unexpected error occurred. Please try again.';
+                    _errorMessage = 'An unexpected error occurred: ${e.toString()}';
                   });
+                  
+                  context.showErrorNotification(
+                    title: "Login Error!",
+                    message: "An unexpected error occurred. Please try again.",
+                  );
                 }
               } : null,
               style: ElevatedButton.styleFrom(
@@ -240,14 +339,11 @@ Widget build(BuildContext context) {
             ),
           ),
           
-          // Google button with same width as Sign In button
           SizedBox(
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement Google login
-              },
+              onPressed: !_isLoading ? _signInWithGoogle : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 elevation: 0,
@@ -263,6 +359,13 @@ Widget build(BuildContext context) {
                     'assets/ic_google.png',
                     width: 24,
                     height: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Sign in with Google',
+                    style: blackTextStyle.copyWith(
+                      fontWeight: medium,
+                    ),
                   ),
                 ],
               ),

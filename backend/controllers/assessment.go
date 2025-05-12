@@ -88,3 +88,25 @@ func (c *AssessmentController) GetAssessmentHistory(ctx *gin.Context) {
 	// Return the history
 	ctx.JSON(http.StatusOK, history)
 }
+
+// CheckAssessmentStatus mengecek apakah user perlu mengisi assessment
+func (c *AssessmentController) CheckAssessmentStatus(ctx *gin.Context) {
+	// Get user ID from context (set by auth middleware)
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	// Cek status assessment
+	needsAssessment, err := c.assessmentService.CheckAssessmentStatus(userID.(int))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return response
+	ctx.JSON(http.StatusOK, gin.H{
+		"needs_assessment": needsAssessment,
+	})
+}

@@ -103,3 +103,24 @@ func (c *AuthController) GetCurrentUser(ctx *gin.Context) {
 	// Return the user
 	ctx.JSON(http.StatusOK, user)
 }
+
+// SupabaseAuth handles authentication with Supabase (OAuth)
+func (c *AuthController) SupabaseAuth(ctx *gin.Context) {
+	var req models.SupabaseAuthRequest
+
+	// Bind request body
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Proses autentikasi
+	response, err := c.authService.SupabaseAuth(req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return hasil
+	ctx.JSON(http.StatusOK, response)
+}

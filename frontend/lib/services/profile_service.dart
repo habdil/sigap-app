@@ -4,7 +4,7 @@ import 'package:frontend/models/user_profile_model.dart';
 import 'package:frontend/services/storage_service.dart';
 
 class ProfileService {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'http://192.168.1.17:3000/api';
   
   static Future<Map<String, dynamic>> updateProfile(UserProfile profile) async {
     try {

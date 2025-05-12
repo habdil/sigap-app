@@ -23,10 +23,8 @@ func main() {
 	// Initialize database
 	config.InitDB()
 
-	// Set Gin mode
-	if gin.Mode() != gin.ReleaseMode {
-		gin.SetMode(gin.DebugMode)
-	}
+	// Set Gin mode to Release (Production)
+	gin.SetMode(gin.ReleaseMode)
 
 	// Create default router
 	router := gin.Default()
@@ -38,10 +36,10 @@ func main() {
 	routes.SetupAuthRoutes(router)
 	routes.SetupProfileRoutes(router)
 	routes.SetupAssessmentRoutes(router)
-	routes.SetupActivityRoutes(router) // Tambahkan ini
+	routes.SetupActivityRoutes(router)
 	routes.SetupFoodRoutes(router)
 	routes.SetupCoinRoutes(router)
-	routes.SetupChatbotRoutes(router) // Tambahkan ini
+	routes.SetupChatbotRoutes(router)
 
 	// Add health check endpoint
 	router.GET("/health", func(c *gin.Context) {

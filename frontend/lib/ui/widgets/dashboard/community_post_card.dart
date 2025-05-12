@@ -113,9 +113,9 @@ class CommunityPostCard extends StatelessWidget {
             child: Row(
               children: [
                 // Profile Picture
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 20,
-                  backgroundImage: AssetImage('assets/profile.png'),
+                  backgroundImage: AssetImage('assets/img_card_people.png'),
                 ),
                 const SizedBox(width: 12),
                 // Username + Time

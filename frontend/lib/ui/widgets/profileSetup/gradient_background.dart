@@ -13,7 +13,7 @@ class GradientBackground extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            Color(0xFFDCECFE), // Light blue
+            Color.fromARGB(255, 211, 231, 255), // Light blue
             Color(0xFFFFC8A2), // Light orange
           ],
         ),

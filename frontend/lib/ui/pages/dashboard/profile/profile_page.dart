@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/blocs/user_bloc.dart';
+import 'package:frontend/services/storage_service.dart';
+import 'package:frontend/services/supabase_auth_service.dart';
 import 'package:frontend/shared/navbar.dart';
 import 'package:frontend/shared/theme.dart';
+import 'package:frontend/ui/pages/auth/home_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -155,7 +159,7 @@ class ProfilePage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement logout
+                        _handleLogout(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
@@ -250,4 +254,85 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+}
+
+void _handleLogout(BuildContext context) async {
+  // Tampilkan dialog konfirmasi
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(
+        'Konfirmasi',
+        style: blackTextStyle.copyWith(
+          fontWeight: semiBold,
+        ),
+      ),
+      content: Text(
+        'Apakah Anda yakin ingin keluar?',
+        style: blackTextStyle,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // Tutup dialog
+          },
+          child: Text(
+            'Batal',
+            style: greyTextStyle,
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Tutup dialog konfirmasi terlebih dahulu
+            Navigator.pop(context);
+            
+            try {
+              // Lakukan proses logout tanpa loading dialog untuk menghindari masalah
+              
+              // 1. Logout dari Supabase (jika menggunakan Supabase)
+              final authService = SupabaseAuthService();
+              await authService.signOut();
+              
+              // 2. Clear data di storage
+              await StorageService.clearAll();
+              
+              // 3. Clear user state di bloc
+              UserBloc().clearUser();
+              
+              // 4. Navigasi ke home page (dengan menghapus semua halaman sebelumnya)
+              if (context.mounted) {
+                // Navigasi ke HomePage dengan menghapus semua rute sebelumnya
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const HomePage(),
+                  ),
+                  (route) => false, // Hapus semua route sebelumnya
+                );
+              }
+            } catch (e) {
+              // Tangani error jika terjadi
+              print('Error during logout: $e');
+              
+              if (context.mounted) {
+                // Tampilkan pesan error
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Terjadi kesalahan saat logout: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          child: Text(
+            'Keluar',
+            style: whiteTextStyle,
+          ),
+        ),
+      ],
+    ),
+  );
 }

@@ -147,3 +147,72 @@ func (s *AuthService) GoogleLogin(req models.GoogleLoginRequest) (*models.AuthRe
 func (s *AuthService) GetUserByID(id int) (*models.User, error) {
 	return s.userRepo.GetUserByID(id)
 }
+
+// SupabaseAuth handles authentication with Supabase
+func (s *AuthService) SupabaseAuth(req models.SupabaseAuthRequest) (*models.AuthResponse, error) {
+	// Coba cari user berdasarkan supabase_uuid
+	user, err := s.userRepo.GetUserBySupabaseUUID(req.SupabaseUUID)
+	if err == nil {
+		// User ditemukan, generate token
+		token, err := utils.GenerateToken(user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.AuthResponse{
+			Token: token,
+			User:  *user,
+		}, nil
+	}
+
+	// Coba cari user berdasarkan email
+	user, err = s.userRepo.GetUserByEmail(req.Email)
+	if err == nil {
+		// User sudah ada, perbarui dengan supabase_uuid
+		err = s.userRepo.UpdateUserSupabaseInfo(user.ID, req.SupabaseUUID, req.GoogleID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Ambil user yang sudah diupdate
+		user, err = s.userRepo.GetUserByID(user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Generate token
+		token, err := utils.GenerateToken(user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &models.AuthResponse{
+			Token: token,
+			User:  *user,
+		}, nil
+	}
+
+	// User baru, buat user
+	user = &models.User{
+		Username:     req.Username,
+		Email:        req.Email,
+		SupabaseUUID: req.SupabaseUUID,
+		GoogleID:     req.GoogleID,
+	}
+
+	// Simpan user baru
+	if err := s.userRepo.CreateUserWithSupabase(user); err != nil {
+		return nil, err
+	}
+
+	// Generate token
+	token, err := utils.GenerateToken(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.AuthResponse{
+		Token: token,
+		User:  *user,
+	}, nil
+}

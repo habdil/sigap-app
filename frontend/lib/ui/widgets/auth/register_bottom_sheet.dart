@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/supabase_auth_service.dart'; // Tambahkan ini
 import 'package:frontend/shared/notification.dart';
 import 'package:frontend/shared/theme.dart';
-import 'package:frontend/ui/widgets/auth/login_bottom_sheet.dart'; // Import login bottom sheet
+import 'package:frontend/ui/widgets/auth/login_bottom_sheet.dart';
+import 'package:frontend/ui/widgets/auth/auth_redirector.dart'; // Tambahkan ini
 import 'package:frontend/services/auth_service.dart';
 
 class RegisterBottomSheet extends StatefulWidget {
@@ -19,6 +21,8 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
   bool _privacyPolicyChecked = false;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true; // Tambahkan ini untuk password visibility
+  bool _obscureConfirmPassword = true; // Tambahkan ini untuk confirm password visibility
 
   @override
   void dispose() {
@@ -27,6 +31,41 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+  
+  // Tambahkan fungsi Google sign in
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      final authService = SupabaseAuthService();
+      final success = await authService.handleGoogleSignIn(context);
+      
+      if (!mounted) return;
+      
+      setState(() {
+        _isLoading = false;
+      });
+      
+      if (success) {
+        // Close bottom sheet
+        Navigator.pop(context);
+                  
+        // Navigate to the redirect page
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const AuthRedirector()),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Terjadi kesalahan saat mendaftar dengan Google: ${e.toString()}';
+      });
+    }
   }
 
   @override
@@ -98,10 +137,10 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
           ),
           const SizedBox(height: 24),
           
-          // Password Field
+          // Password Field - Dengan toggle visibility
           TextField(
             controller: _passwordController,
-            obscureText: true,
+            obscureText: _obscurePassword, // Gunakan variabel state
             decoration: InputDecoration(
               hintText: 'Enter Password',
               hintStyle: greyTextStyle,
@@ -111,14 +150,25 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: blueColor),
               ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: greyColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              ),
             ),
           ),
           const SizedBox(height: 24),
           
-          // Confirm Password Field
+          // Confirm Password Field - Dengan toggle visibility
           TextField(
             controller: _confirmPasswordController,
-            obscureText: true,
+            obscureText: _obscureConfirmPassword, // Gunakan variabel state
             decoration: InputDecoration(
               hintText: 'Confirm Password',
               hintStyle: greyTextStyle,
@@ -127,6 +177,17 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
               ),
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: blueColor),
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                  color: greyColor,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                  });
+                },
               ),
             ),
           ),
@@ -197,6 +258,15 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
             height: 55,
             child: ElevatedButton(
               onPressed: (_privacyPolicyChecked && !_isLoading) ? () async {
+                // Validate inputs
+                if (_usernameController.text.isEmpty || _emailController.text.isEmpty || 
+                    _passwordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
+                  setState(() {
+                    _errorMessage = 'Please fill in all fields';
+                  });
+                  return;
+                }
+                
                 // Validate passwords match
                 if (_passwordController.text != _confirmPasswordController.text) {
                   setState(() {
@@ -219,15 +289,17 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                     password: _passwordController.text,
                   );
                   
+                  if (!mounted) return;
+                  
                   setState(() {
                     _isLoading = false;
                   });
                   
                   if (result['success']) {
-                    // Show success message and close the sheet
-                    context.showErrorNotification(
-                      title: "Login Failed!",
-                      message: result['message'] ?? "Your username or password is incorrect, please try again!",
+                    // PERBAIKAN: Ganti dari error ke success notification
+                    context.showSuccessNotification(
+                      title: "Registration Success!",
+                      message: "Your account has been created successfully. Please login to continue.",
                     );
                     
                     Navigator.pop(context);
@@ -248,11 +320,12 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                     );
                   } else {
                     context.showErrorNotification(
-                      title: "Login Failed!",
-                      message: result['message'] ?? "Your username or password is incorrect, please try again!",
+                      title: "Registration Failed!",
+                      message: result['message'] ?? "Failed to create account. Please try again.",
                     );
                   }
                 } catch (e) {
+                  if (!mounted) return;
                   setState(() {
                     _isLoading = false;
                     _errorMessage = 'An unexpected error occurred. Please try again.';
@@ -312,9 +385,7 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
             width: double.infinity,
             height: 55,
             child: ElevatedButton(
-              onPressed: () {
-                // TODO: Implement Google registration
-              },
+              onPressed: !_isLoading ? _signInWithGoogle : null, // Implementasi fungsi Google sign in
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 elevation: 0,
@@ -330,6 +401,13 @@ class _RegisterBottomSheetState extends State<RegisterBottomSheet> {
                     'assets/ic_google.png',
                     width: 24,
                     height: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Sign in with Google', // Tambahkan teks
+                    style: blackTextStyle.copyWith(
+                      fontWeight: medium,
+                    ),
                   ),
                 ],
               ),

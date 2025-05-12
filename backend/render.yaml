@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: sigap-app-backend
+    env: docker
+    region: singapore  # Sesuaikan dengan region terdekat
+    plan: free  # Atau pilih plan berbayar jika diperlukan
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false  # Akan diisi secara manual di dashboard Render
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRY
+        value: 24h
+      - key: GEMINI_API_KEY
+        sync: false

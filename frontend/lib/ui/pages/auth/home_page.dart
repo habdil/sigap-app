@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/supabase_auth_service.dart';
 import 'package:frontend/shared/theme.dart';
+import 'package:frontend/ui/widgets/auth/auth_redirector.dart';
 import 'package:frontend/ui/widgets/auth/login_bottom_sheet.dart';
 import 'package:frontend/ui/widgets/auth/register_bottom_sheet.dart'; // Import the register bottom sheet
 
@@ -115,8 +117,16 @@ class HomePage extends StatelessWidget {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
-                          // TODO: Implementasi login dengan Google
+                        onPressed: () async {
+                          // Tambahkan loading state jika perlu
+                          final authService = SupabaseAuthService();
+                          final success = await authService.handleGoogleSignIn(context);
+                          
+                          if (success) {
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (context) => const AuthRedirector()),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: whiteColor,

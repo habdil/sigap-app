@@ -18,5 +18,6 @@ func SetupAssessmentRoutes(router *gin.Engine) {
 		assessment.POST("", assessmentController.SubmitAssessment)
 		assessment.GET("/latest", assessmentController.GetLatestAssessment)
 		assessment.GET("/history", assessmentController.GetAssessmentHistory)
+		assessment.GET("/status", assessmentController.CheckAssessmentStatus)
 	}
 }
