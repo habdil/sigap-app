@@ -348,7 +348,7 @@ Widget _buildRedeemItem(
           padding: const EdgeInsets.only(left: 12, right: 12, bottom: 6, top: 12),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.only(bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,59 +483,78 @@ Widget _buildRedeemItem(
       children: [
         const Text('HISTORY ACTIVITIES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         const SizedBox(height: 12),
-        GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+        GridView(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 5 / 6, // Ubah ini untuk mengatur tinggi
+          ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            _buildHistoryItem('YESTERDAY','Running',4.5,45,'Morning Routine',6028,orangeColor),
+                _buildHistoryItem('YESTERDAY','Running',4.5,45,'Morning Routine',6028,orangeColor),
             _buildHistoryItem('FRIDAY','Running',4.5,45,'Morning Routine',6028,Colors.white),
             _buildHistoryItem('YESTERDAY','YOGA',0,45,'YOGA TIME...',6028,Colors.white),
             _buildHistoryItem('YESTERDAY','Running',4.5,45,'Morning Routine',6028,orangeColor),
+            
           ],
-        ),
+        )
+        // GridView.count(
+        //   crossAxisCount: 2,
+        //   crossAxisSpacing: 12,
+        //   mainAxisSpacing: 12,
+        //   shrinkWrap: true,
+        //   physics: const NeverScrollableScrollPhysics(),
+        //   children: [
+        //     _buildHistoryItem('YESTERDAY','Running',4.5,45,'Morning Routine',6028,orangeColor),
+        //     _buildHistoryItem('FRIDAY','Running',4.5,45,'Morning Routine',6028,Colors.white),
+        //     _buildHistoryItem('YESTERDAY','YOGA',0,45,'YOGA TIME...',6028,Colors.white),
+        //     _buildHistoryItem('YESTERDAY','Running',4.5,45,'Morning Routine',6028,orangeColor),
+        //   ],
+        // ),
       ],
     );
   }
 
   Widget _buildHistoryItem(String day, String activity, double distance, int duration, String title, int steps, Color bgColor) {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-        border: bgColor == Colors.white ? Border.all(color: Colors.grey.shade300) : null,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12, top: 16),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
+            border: bgColor == Colors.white ? Border.all(color: Colors.grey.shade300) : null,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(day, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: bgColor == Colors.white ? Colors.black : Colors.white)),
-              if (activity != 'YOGA') Text('$distance km', style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(day, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+                  if (activity != 'YOGA') Text('$distance km', style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Container(height: 4, decoration: BoxDecoration(color: bgColor == Colors.white ? Colors.orange : Colors.white, borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 4),
+              Text(activity, style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+              const Spacer(),
+              Text('$duration min', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+              Text(title, style: TextStyle(fontSize: 14, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+              const Spacer(),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('$steps', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: bgColor == Colors.white ? Colors.black : Colors.white)),
+                  Row(children: [Icon(Icons.monetization_on, size: 12, color: bgColor == Colors.white ? Colors.amber : Colors.white), const SizedBox(width: 2), Text('+$steps', style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.orange : Colors.white))]),
+                ],
+              ),
+              Text('steps', style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.black : Colors.white)),
             ],
           ),
-          const SizedBox(height: 4),
-          Container(height: 4, decoration: BoxDecoration(color: bgColor == Colors.white ? Colors.orange : Colors.white, borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 4),
-          Text(activity, style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.black : Colors.white)),
-          const Spacer(),
-          Text('$duration min', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: bgColor == Colors.white ? Colors.black : Colors.white)),
-          Text(title, style: TextStyle(fontSize: 14, color: bgColor == Colors.white ? Colors.black : Colors.white)),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('$steps', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: bgColor == Colors.white ? Colors.black : Colors.white)),
-              Row(children: [Icon(Icons.monetization_on, size: 12, color: bgColor == Colors.white ? Colors.amber : Colors.white), const SizedBox(width: 2), Text('+$steps', style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.orange : Colors.white))]),
-            ],
-          ),
-          Text('steps', style: TextStyle(fontSize: 10, color: bgColor == Colors.white ? Colors.black : Colors.white)),
-        ],
-      ),
-    );
+        );
+    
   }
 }
