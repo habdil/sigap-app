@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/blocs/user_bloc.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/shared/theme.dart';
+import 'package:frontend/ui/pages/dashboard/activity/activity_page.dart';
 import 'package:frontend/ui/pages/dashboard/dashboard_page.dart';
 import 'package:frontend/ui/pages/dashboard/food/food_page.dart';
 import 'package:frontend/ui/pages/splash_page.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashPage(),
+      home: const ActivityPage(),
     );
   }
 }
