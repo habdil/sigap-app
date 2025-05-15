@@ -240,12 +240,110 @@ class _ProfileHeaderState extends State<ProfileHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+
     if (_isLoading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(20.0),
-          child: CircularProgressIndicator(),
-        ),
+      // Efisien loading state yang lebih ringan
+      return Stack(
+        children: [
+          // Background placeholder
+          Container(
+            height: 200,
+            width: double.infinity,
+            color: Colors.grey.shade300,
+          ),
+          // Profile info container placeholder
+          Container(
+            margin: const EdgeInsets.only(top: 150),
+            padding: const EdgeInsets.only(top: 60, bottom: 20),
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Placeholder for name and details
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name and profile info placeholders
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 120,
+                              height: 24,
+                              color: Colors.grey.shade200,
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              width: 180,
+                              height: 16,
+                              color: Colors.grey.shade200,
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              width: screenWidth * 0.5,
+                              height: 14,
+                              color: Colors.grey.shade200,
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              width: screenWidth * 0.4,
+                              height: 14,
+                              color: Colors.grey.shade200,
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Edit button placeholder
+                      Container(
+                        width: 80,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+          // Avatar placeholder
+          Positioned(
+            top: 100,
+            left: screenWidth / 2 - (isSmallScreen ? 160 : 180),
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: Center(
+                child: Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
@@ -290,7 +388,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
             children: [
               // Name, Followers, Claps, and Edit Profile in one row
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 16 : 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +401,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                           Text(
                             _getDisplayName(),
                             style: blackTextStyle.copyWith(
-                              fontSize: 24,
+                              fontSize: isSmallScreen ? 20 : 24,
                               fontWeight: semiBold,
                             ),
                           ),
@@ -311,23 +409,25 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                           Text(
                             _user?.email ?? '',
                             style: greyTextStyle.copyWith(
-                              fontSize: 16,
+                              fontSize: isSmallScreen ? 14 : 16,
                             ),
                           ),
                           const SizedBox(height: 12),
                           SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
+                            width: isSmallScreen 
+                                ? screenWidth * 0.45
+                                : screenWidth * 0.5,
                             child: _userProfile != null && _userProfile!.isComplete
                                 ? Text(
                                     'Age: ${_userProfile!.age} years, Height: ${_userProfile!.height} cm, Weight: ${_userProfile!.weight} kg',
                                     style: blackTextStyle.copyWith(
-                                      fontSize: 14,
+                                      fontSize: isSmallScreen ? 12 : 14,
                                     ),
                                   )
                                 : Text(
                                     'Complete your profile to track your health metrics better.',
                                     style: blackTextStyle.copyWith(
-                                      fontSize: 14,
+                                      fontSize: isSmallScreen ? 12 : 14,
                                     ),
                                   ),
                           ),
@@ -347,7 +447,10 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                         GestureDetector(
                           onTap: _showEditProfileDialog,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                            padding: EdgeInsets.symmetric(
+                              vertical: isSmallScreen ? 6 : 8, 
+                              horizontal: isSmallScreen ? 12 : 16
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(30),
@@ -355,16 +458,16 @@ class _ProfileHeaderState extends State<ProfileHeader> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.edit_outlined,
-                                  size: 16,
+                                  size: isSmallScreen ? 14 : 16,
                                   color: Colors.black87,
                                 ),
-                                const SizedBox(width: 4),
+                                SizedBox(width: isSmallScreen ? 2 : 4),
                                 Text(
                                   'Edit Profile',
                                   style: blackTextStyle.copyWith(
-                                    fontSize: 12,
+                                    fontSize: isSmallScreen ? 10 : 12,
                                     fontWeight: semiBold,
                                   ),
                                 ),
@@ -384,7 +487,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
         // Profile Avatar
         Positioned(
           top: 100,
-          left: MediaQuery.of(context).size.width / 2 - 180,
+          left: MediaQuery.of(context).size.width / 2 - (isSmallScreen ? 160 : 180),
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -399,7 +502,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
               ],
             ),
             child: CircleAvatar(
-              radius: 50,
+              radius: isSmallScreen ? 46 : 50,
               backgroundColor: Colors.white,
               backgroundImage: NetworkImage(_getAvatarUrl()),
             ),

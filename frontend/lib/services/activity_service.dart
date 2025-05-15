@@ -88,103 +88,127 @@ class ActivityService {
     }
   }
 
-  // Method untuk mendapatkan daftar aktivitas
-  static Future<Map<String, dynamic>> getActivities() async {
+static Future<Map<String, dynamic>> getActivities() async {
+  try {
+    print('ActivityService: Getting activities');
+    final user = await StorageService.getUser();
+    if (user == null || user.token == null) {
+      print('ActivityService: User not authenticated in getActivities');
+      return {
+        'success': false,
+        'message': 'User not authenticated',
+      };
+    }
+
+    final client = http.Client();
     try {
-      print('ActivityService: Getting activities');
-      final user = await StorageService.getUser();
-      if (user == null || user.token == null) {
-        print('ActivityService: User not authenticated in getActivities');
-        return {
-          'success': false,
-          'message': 'User not authenticated',
-        };
-      }
+      final String fetchUrl = AppConfig.instance.apiBaseUrl + '/activities';
+      print('ActivityService: Requesting activities from API: $fetchUrl');
+      
+      final response = await client.get(
+        Uri.parse(fetchUrl),
+        headers: {
+          'Authorization': 'Bearer ${user.token}',
+        },
+      ).timeout(Duration(seconds: timeout));
 
-      final client = http.Client();
-      try {
-        final String fetchUrl = AppConfig.instance.apiBaseUrl + '/activities'; // Perbaikan URL (activities, bukan activites)
-        print('ActivityService: Requesting activities from API: $fetchUrl');
+      print('ActivityService: Activities response status: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        // Tangani respons kosong atau null
+        if (response.body.isEmpty) {
+          print('ActivityService: Received empty response body for activities');
+          return {
+            'success': true,
+            'data': <ActivityModel>[],
+          };
+        }
         
-        final response = await client.get(
-          Uri.parse(fetchUrl),
-          headers: {
-            'Authorization': 'Bearer ${user.token}',
-          },
-        ).timeout(Duration(seconds: timeout));
-
-        print('ActivityService: Activities response status: ${response.statusCode}');
-        
-        if (response.statusCode == 200) {
-          // Tangani respons kosong
-          if (response.body.isEmpty) {
-            print('ActivityService: Received empty response body for activities');
+        try {
+          final dynamic responseData = jsonDecode(response.body);
+          
+          // Perbaikan: Cek jika responseData adalah null atau bukan List
+          if (responseData == null) {
+            print('ActivityService: Response data is null, returning empty list');
             return {
               'success': true,
               'data': <ActivityModel>[],
             };
           }
           
-          try {
-            final List<dynamic> responseData = jsonDecode(response.body);
-            final List<ActivityModel> activities = responseData
-                .map((json) => ActivityModel.fromJson(json))
-                .toList();
-            
-            print('ActivityService: Successfully parsed ${activities.length} activities');
+          if (responseData is! List) {
+            print('ActivityService: Response data is not a list, returning empty list');
+            print('ActivityService: Response data type: ${responseData.runtimeType}');
             return {
               'success': true,
-              'data': activities,
+              'data': <ActivityModel>[],
             };
-          } catch (e) {
-            print('ActivityService: Error parsing activities: $e');
-            if (response.body.isNotEmpty) {
-              print('ActivityService: Response body prefix: ${response.body.substring(0, min(100, response.body.length))}');
-            }
-            return {
-              'success': false,
-              'message': 'Error parsing response: ${e.toString()}',
-            };
-          }
-        } else {
-          Map<String, dynamic> errorData = {};
-          try {
-            if (response.body.isNotEmpty) {
-              errorData = jsonDecode(response.body);
-              print('ActivityService: Error response body: ${response.body}');
-            }
-          } catch (e) {
-            print('ActivityService: Error parsing error response: $e');
           }
           
+          final List<dynamic> activityList = responseData;
+          final List<ActivityModel> activities = activityList
+              .map((json) => ActivityModel.fromJson(json))
+              .toList();
+          
+          print('ActivityService: Successfully parsed ${activities.length} activities');
           return {
-            'success': false,
-            'message': errorData['message'] ?? 'Failed to get activities (Status: ${response.statusCode})',
+            'success': true,
+            'data': activities,
+          };
+        } catch (e) {
+          print('ActivityService: Error parsing activities: $e');
+          if (response.body.isNotEmpty) {
+            print('ActivityService: Response body prefix: ${response.body.substring(0, min(100, response.body.length))}');
+          } else {
+            print('ActivityService: Response body is empty');
+          }
+          
+          // Perbaikan: Return empty list pada kasus parsing error
+          return {
+            'success': true,
+            'data': <ActivityModel>[],
+            'message': 'No activities found or data format is incorrect',
           };
         }
-      } on TimeoutException {
-        print('ActivityService: Request timed out during get activities');
+      } else {
+        Map<String, dynamic> errorData = {};
+        try {
+          if (response.body.isNotEmpty) {
+            errorData = jsonDecode(response.body);
+            print('ActivityService: Error response body: ${response.body}');
+          }
+        } catch (e) {
+          print('ActivityService: Error parsing error response: $e');
+        }
+        
         return {
           'success': false,
-          'message': 'Request timed out. Please check your network connection and try again.',
+          'message': errorData['message'] ?? 'Failed to get activities (Status: ${response.statusCode})',
         };
-      } catch (e) {
-        print('ActivityService: Network error in getActivities: $e');
-        return {
-          'success': false,
-          'message': 'Network error: ${e.toString()}',
-        };
-      } finally {
-        client.close();
       }
-    } catch (e) {
-      print('ActivityService: General error in getActivities: $e');
+    } on TimeoutException {
+      print('ActivityService: Request timed out during get activities');
       return {
         'success': false,
-        'message': 'Error: ${e.toString()}',
+        'message': 'Request timed out. Please check your network connection and try again.',
       };
+    } catch (e) {
+      print('ActivityService: Network error in getActivities: $e');
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+      };
+    } finally {
+      client.close();
     }
+  } catch (e) {
+    print('ActivityService: General error in getActivities: $e');
+    return {
+      'success': false,
+      'message': 'Error: ${e.toString()}',
+    };
   }
+}
 
   // Helper function untuk membatasi string length
   static int min(int a, int b) {

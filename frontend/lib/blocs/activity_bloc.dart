@@ -23,32 +23,36 @@ class ActivityBloc extends ChangeNotifier {
   String get errorMessage => _errorMessage;
   bool get isAddingActivity => _isAddingActivity;
 
-  // Metode untuk mengambil daftar aktivitas
-  Future<void> getActivities() async {
-    try {
-      print('ActivityBloc: Starting getActivities');
-      _state = ActivityBlocState.loading;
-      notifyListeners();
+Future<void> getActivities() async {
+  try {
+    print('ActivityBloc: Starting getActivities');
+    _state = ActivityBlocState.loading;
+    notifyListeners();
 
-      final result = await ActivityService.getActivities();
+    final result = await ActivityService.getActivities();
+    
+    if (result['success']) {
+      _activities = result['data'];
+      _state = ActivityBlocState.loaded;
+      print('ActivityBloc: Successfully loaded ${_activities.length} activities');
       
-      if (result['success']) {
-        _activities = result['data'];
-        _state = ActivityBlocState.loaded;
-        print('ActivityBloc: Successfully loaded ${_activities.length} activities');
-      } else {
-        _errorMessage = result['message'];
-        _state = ActivityBlocState.error;
-        print('ActivityBloc: Error getting activities: $_errorMessage');
+      // Tambahkan pesan jika tidak ada aktivitas
+      if (_activities.isEmpty) {
+        print('ActivityBloc: No activities found');
       }
-    } catch (e) {
-      _errorMessage = 'Error: ${e.toString()}';
+    } else {
+      _errorMessage = result['message'];
       _state = ActivityBlocState.error;
-      print('ActivityBloc: Exception in getActivities: $e');
-    } finally {
-      notifyListeners();
+      print('ActivityBloc: Error getting activities: $_errorMessage');
     }
+  } catch (e) {
+    _errorMessage = 'Error: ${e.toString()}';
+    _state = ActivityBlocState.error;
+    print('ActivityBloc: Exception in getActivities: $e');
+  } finally {
+    notifyListeners();
   }
+}
 
   // Metode untuk menambahkan aktivitas baru
   Future<bool> addActivity(ActivityModel activity) async {
