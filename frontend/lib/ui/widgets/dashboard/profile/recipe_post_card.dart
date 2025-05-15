@@ -1,4 +1,3 @@
-// frontend/lib/ui/widgets/dashboard/profile/recipe_post_card.dart
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
 
@@ -7,8 +6,17 @@ class RecipePostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size
+    final Size screenSize = MediaQuery.of(context).size;
+    final bool isSmallScreen = screenSize.width < 360;
+    
     return Container(
-      height: 200,
+      // Use adaptive height based on screen size
+      height: screenSize.height * 0.25, // 25% of screen height
+      constraints: BoxConstraints(
+        minHeight: 150, // Minimum height
+        maxHeight: 230, // Maximum height
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.white,
@@ -49,12 +57,13 @@ class RecipePostCard extends StatelessWidget {
             ),
           ),
           
-          // Content - Right aligned
+          // Content - Right aligned with adaptive width
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.6,
-              padding: EdgeInsets.all(20),
+              // Adaptive width based on screen size
+              width: screenSize.width * (isSmallScreen ? 0.7 : 0.6),
+              padding: EdgeInsets.all(isSmallScreen ? 12 : 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -62,17 +71,21 @@ class RecipePostCard extends StatelessWidget {
                   Text(
                     'salad recipe recommendations',
                     style: blackTextStyle.copyWith(
-                      fontSize: 20,
+                      // Adjust font size for smaller screens
+                      fontSize: isSmallScreen ? 16 : 20,
                       fontWeight: semiBold,
                     ),
+                    // Enable text wrapping
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: isSmallScreen ? 8 : 16),
                   Row(
                     children: [
                       Text(
                         'click for recipe',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: isSmallScreen ? 12 : 14,
                           fontWeight: medium,
                           color: Color(0xFFFF7A45),
                         ),
@@ -81,12 +94,12 @@ class RecipePostCard extends StatelessWidget {
                       Icon(
                         Icons.chevron_right,
                         color: Color(0xFFFF7A45),
-                        size: 18,
+                        size: isSmallScreen ? 16 : 18,
                       ),
                       Icon(
                         Icons.chevron_right,
                         color: Color(0xFFFF7A45),
-                        size: 18,
+                        size: isSmallScreen ? 16 : 18,
                       ),
                     ],
                   ),
