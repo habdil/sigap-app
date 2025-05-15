@@ -1,15 +1,20 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/blocs/user_bloc.dart';
+import 'package:frontend/blocs/food_bloc.dart';
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/pages/splash_page.dart';
 import 'package:frontend/providers/chatbot_provider.dart';
 import 'package:frontend/config/supabase_config.dart';
+import '../config/app_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  AppConfig.initialize();
   
   // Initialize Supabase before checking user session
   await SupabaseConfig.initialize();
@@ -47,30 +52,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return MultiBlocProvider(
       providers: [
-        // Add ChatbotProvider
-        ChangeNotifierProvider(create: (_) => ChatbotProvider()),
-        // You can add other providers here if needed
+        // Add FoodBloc
+        BlocProvider<FoodBloc>(
+          create: (context) => FoodBloc(),
+        ),
+        // Add other BlocProviders if needed
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          scaffoldBackgroundColor: lightBackgroundColor,
-          appBarTheme: AppBarTheme(
-            backgroundColor: lightBackgroundColor,
-            elevation: 0,
-            centerTitle: true,
-            iconTheme: IconThemeData(
-              color: blackColor,
-            ),
-            titleTextStyle: blackTextStyle.copyWith(
-              fontSize: 18,
-              fontWeight: medium,
+      child: MultiProvider(
+        providers: [
+          // Add ChatbotProvider
+          ChangeNotifierProvider(create: (_) => ChatbotProvider()),
+          // You can add other providers here if needed
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            scaffoldBackgroundColor: lightBackgroundColor,
+            appBarTheme: AppBarTheme(
+              backgroundColor: lightBackgroundColor,
+              elevation: 0,
+              centerTitle: true,
+              iconTheme: IconThemeData(
+                color: blackColor,
+              ),
+              titleTextStyle: blackTextStyle.copyWith(
+                fontSize: 18,
+                fontWeight: medium,
+              ),
             ),
           ),
+          home: const SplashPage(),
         ),
-        home: const SplashPage(),
       ),
     );
   }

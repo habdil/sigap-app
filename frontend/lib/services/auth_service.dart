@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:frontend/config/app_config.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  // Base URL of your API
-  static const String baseUrl = 'http://192.168.1.17:3000/api/auth'; // Replace with your actual API URL
+  // Dapatkan base URL dari konfigurasi
+  static String get baseUrl => '${AppConfig.instance.apiBaseUrl}/auth';
+  static int get timeout => AppConfig.instance.timeout; // Replace with your actual API URL
   
   // Signup method
   static Future<Map<String, dynamic>> signup({
@@ -12,7 +14,6 @@ class AuthService {
     required String password,
   }) async {
     try {
-      print('Attempting to connect to: $baseUrl/signup');
       
       final response = await http.post(
         Uri.parse('$baseUrl/signup'),
@@ -26,8 +27,6 @@ class AuthService {
         }),
       ).timeout(const Duration(seconds: 15));
       
-      print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body.length > 100 ? response.body.substring(0, 100) + '...' : response.body}');
       
       // Try to parse as JSON first
       try {

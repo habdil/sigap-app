@@ -3,7 +3,7 @@ import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/pages/dashboard/dashboard_page.dart';
 import 'package:frontend/ui/pages/dashboard/food/food_page.dart';
 import 'package:frontend/ui/pages/dashboard/profile/profile_page.dart';
-import 'package:frontend/ui/pages/dashboard/sport/sport_page.dart';
+import 'package:frontend/ui/pages/dashboard/sport/activity_page.dart';
 
 class CustomNavBar extends StatefulWidget {
   final int initialIndex;
@@ -40,7 +40,7 @@ class _CustomNavBarState extends State<CustomNavBar> {
         page = const DashboardPage();
         break;
       case 1:
-        page = const SportPage();
+        page = const ActivityPage();
         break;
       case 2:
         page = const FoodPage();

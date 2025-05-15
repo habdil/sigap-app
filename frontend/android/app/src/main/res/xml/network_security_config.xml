@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Mengizinkan koneksi cleartext hanya ke server backend spesifik -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">69.62.82.146</domain>
+        <!-- Tambahkan domain lain jika diperlukan -->
+    </domain-config>
+
+    <!-- Konfigurasi default - tidak mengizinkan cleartext traffic ke domain lain -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

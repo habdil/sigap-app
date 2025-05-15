@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/widgets/dashboard/activity.dart';
-import 'package:frontend/ui/pages/dashboard/sport/sport_page.dart'; // Import sport page
+import 'package:frontend/ui/pages/dashboard/sport/activity_page.dart'; // Import sport page
 
 class ActivitySection extends StatelessWidget {
   final VoidCallback onSeeAllTapped;
@@ -29,7 +29,7 @@ class ActivitySection extends StatelessWidget {
                   // Navigate to SportPage when "see all" is tapped
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SportPage()),
+                    MaterialPageRoute(builder: (context) => const ActivityPage()),
                   );
                 },
                 child: Text(

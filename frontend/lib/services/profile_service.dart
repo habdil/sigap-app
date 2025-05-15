@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:frontend/config/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/models/user_profile_model.dart';
 import 'package:frontend/services/storage_service.dart';
 
 class ProfileService {
-  static const String baseUrl = 'http://192.168.1.17:3000/api';
+  // Dapatkan base URL dari konfigurasi
+  static String get baseUrl => AppConfig.instance.apiBaseUrl;
+  static int get timeout => AppConfig.instance.timeout; // Replace with your actual API URL
   
   static Future<Map<String, dynamic>> updateProfile(UserProfile profile) async {
     try {
@@ -26,9 +29,6 @@ class ProfileService {
           },
           body: jsonEncode(profile.toJson()),
         ).timeout(const Duration(seconds: 10));
-
-        print('Update profile status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
 
         if (response.statusCode == 200) {
           return {
@@ -52,7 +52,6 @@ class ProfileService {
         client.close();
       }
     } catch (e) {
-      print('Update profile error: $e');
       return {
         'success': false,
         'message': 'Network error: ${e.toString()}',
@@ -101,7 +100,6 @@ class ProfileService {
         client.close();
       }
     } catch (e) {
-      print('Get profile error: $e');
       return {
         'success': false,
         'message': 'Network error: ${e.toString()}',

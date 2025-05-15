@@ -16,24 +16,24 @@ class _OnboardingPageState extends State<OnboardingPage> {
   // Daftar konten onboarding
   final List<Map<String, dynamic>> _contents = [
     {
-      'image': 'assets/ic_onboarding_1.png',
-      'title': 'Monitor your stroke risk with ai',
-      'description': 'Get early stroke prediction, to prevent future strokes, with SIGAP ai can be monitored with your smartphone.',
+      'image': 'assets/ic_onboarding_1.png', // App logo
+      'title': 'Welcome to SIGAP',
+      'description': 'Your personal AI-powered companion for early stroke detection and health monitoring — all from your smartphone.',
     },
     {
-      'image': 'assets/ic_onboarding_2.png',
-      'title': 'Monitor your stroke risk with ai',
-      'description': 'Get early stroke prediction, to prevent future strokes, with SIGAP ai can be monitored with your smartphone.',
+      'image': 'assets/ic_onboarding_2.png', // Trophy icon
+      'title': 'Track Your Health Progress',
+      'description': 'Earn achievements as you stay consistent with your health checkups and reduce your stroke risk over time.',
     },
     {
-      'image': 'assets/ic_onboarding_3.png',
-      'title': 'Monitor your stroke risk with ai',
-      'description': 'Get early stroke prediction, to prevent future strokes, with SIGAP ai can be monitored with your smartphone.',
+      'image': 'assets/ic_onboarding_3.png', // Coin icon
+      'title': 'Affordable & Smart Prevention',
+      'description': 'SIGAP makes stroke prevention accessible and cost-effective, saving you time, money, and worry.',
     },
     {
-      'image': 'assets/ic_onboarding_4.png',
-      'title': 'Monitor your stroke risk with ai',
-      'description': 'Get early stroke prediction, to prevent future strokes, with SIGAP ai can be monitored with your smartphone.',
+      'image': 'assets/ic_onboarding_4.png', // Food icon
+      'title': 'Smart Lifestyle Guidance',
+      'description': 'Get personalized tips on nutrition, activity, and habits to keep your brain healthy and stroke-free.',
     },
   ];
 

@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:frontend/config/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/models/health_assessment_model.dart';
 
 class HealthService {
-  static const String baseUrl = 'http://192.168.1.17:3000/api';
+  // Dapatkan base URL dari konfigurasi
+  static String get baseUrl => '${AppConfig.instance.apiBaseUrl}/assessment';
+  static int get timeout => AppConfig.instance.timeout;
   
   // Method baru untuk mengecek status assessment
   static Future<Map<String, dynamic>> checkAssessmentStatus() async {
@@ -21,14 +24,11 @@ class HealthService {
       final client = http.Client();
       try {
         final response = await client.get(
-          Uri.parse('$baseUrl/assessment/status'),
+          Uri.parse('$baseUrl/status'),
           headers: {
             'Authorization': 'Bearer ${user.token}',
           },
         ).timeout(const Duration(seconds: 10));
-
-        print('Check assessment status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
 
         if (response.statusCode == 200) {
           final responseData = jsonDecode(response.body);
@@ -38,11 +38,7 @@ class HealthService {
           };
         } else {
           Map<String, dynamic> errorData = {};
-          try {
             errorData = jsonDecode(response.body);
-          } catch (e) {
-            // Ignore JSON decode errors
-          }
           
           return {
             'success': false,
@@ -54,7 +50,6 @@ class HealthService {
         client.close();
       }
     } catch (e) {
-      print('Check assessment status error: $e');
       return {
         'success': false,
         'message': 'Network error: ${e.toString()}',
@@ -76,16 +71,13 @@ class HealthService {
       final client = http.Client();
       try {
         final response = await client.post(
-          Uri.parse('$baseUrl/assessment'),
+          Uri.parse(baseUrl),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ${user.token}',
           },
           body: jsonEncode(assessment.toJson()),
         ).timeout(const Duration(seconds: 10));
-
-        print('Submit assessment status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           return {
@@ -109,7 +101,6 @@ class HealthService {
         client.close();
       }
     } catch (e) {
-      print('Submit assessment error: $e');
       return {
         'success': false,
         'message': 'Network error: ${e.toString()}',
@@ -130,7 +121,7 @@ class HealthService {
       final client = http.Client();
       try {
         final response = await client.get(
-          Uri.parse('$baseUrl/assessment/latest'),  // Perhatikan endpoint yang benar: /latest, bukan /result
+          Uri.parse('$baseUrl/latest'),  // Perhatikan endpoint yang benar: /latest, bukan /result
           headers: {
             'Authorization': 'Bearer ${user.token}',
           },
@@ -158,7 +149,6 @@ class HealthService {
         client.close();
       }
     } catch (e) {
-      print('Get latest result error: $e');
       return {
         'success': false,
         'message': 'Network error: ${e.toString()}',

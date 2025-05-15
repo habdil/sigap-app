@@ -43,7 +43,7 @@ func (s *ChatbotService) CreateConversation(userID int, title string) (*models.C
 	}
 
 	// Create initial greeting message from bot
-	greeting := "Halo! Saya adalah AI Health Assistant untuk aplikasi SIGAP. Saya bisa membantu Anda dengan pertanyaan seputar kesehatan, aktivitas fisik, dan gaya hidup. Apa yang bisa saya bantu hari ini?"
+	greeting := "Hello! I'm the AI Health Assistant for the SIGAP app. I can help you with questions about health, physical activity, and lifestyle. How can I assist you today?"
 
 	_, err = s.chatbotRepo.AddMessage(userID, conversation.ID, greeting, "bot", nil)
 	if err != nil {
@@ -142,7 +142,7 @@ func (s *ChatbotService) generateBotResponse(userMessage string, user *models.Us
 	// Format ini berbeda dari versi sebelumnya yang menggunakan role
 	systemPrompt := "Kamu adalah AI Health Assistant untuk aplikasi SIGAP, fokus pada gaya hidup sehat dan pencegahan stroke. " +
 		"Berikan saran tentang olahraga, nutrisi, dan manajemen stres. " +
-		"Jawab dengan sopan, informatif, dan singkat dalam bahasa Indonesia. " +
+		"Jawab dengan sopan, informatif, jangan di bold responnya apapun pertanyaan saya dan singkat dalam bahasa Inggris. " +
 		"Jangan lupa untuk sesekali mengingatkan pentingnya aktivitas fisik, pola makan sehat, dan istirahat yang cukup."
 
 	// Format untuk Gemini 1.5 menggunakan parts dalam contents

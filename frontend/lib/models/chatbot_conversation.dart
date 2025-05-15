@@ -24,7 +24,7 @@ class ChatbotConversation {
   factory ChatbotConversation.fromJson(Map<String, dynamic> json) {
     // Log untuk debugging
     print('Parsing conversation: ${json.keys}');
-
+    
     // Parse messages jika ada
     List<ChatbotMessage>? messagesList;
     if (json.containsKey('messages') && json['messages'] != null) {

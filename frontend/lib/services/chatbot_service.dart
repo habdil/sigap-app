@@ -1,13 +1,15 @@
 // Path: lib/services/chatbot_service.dart
 import 'dart:convert';
+import 'package:frontend/config/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:frontend/models/chatbot_conversation.dart';
 import 'package:frontend/models/chatbot_message.dart';
 import 'package:frontend/services/storage_service.dart';
 
 class ChatbotService {
-  // Base URL dari API - sesuaikan dengan URL backend Anda
-  static const String _baseUrl = 'http://192.168.1.17:3000/api/chatbot';
+  // Dapatkan base URL dari konfigurasi
+  static String get baseUrl => '${AppConfig.instance.apiBaseUrl}/chatbot';
+  static int get timeout => AppConfig.instance.timeout;
   
   // Mendapatkan token autentikasi dari user yang tersimpan
   static Future<String?> _getAuthToken() async {
@@ -39,7 +41,7 @@ class ChatbotService {
       final client = http.Client();
       try {
         final response = await client.post(
-          Uri.parse('$_baseUrl/conversations'),
+          Uri.parse('$baseUrl/conversations'),
           headers: headers,
           body: jsonEncode({'title': title}),
         ).timeout(const Duration(seconds: 15));
@@ -78,7 +80,7 @@ class ChatbotService {
       final client = http.Client();
       try {
         final response = await client.get(
-          Uri.parse('$_baseUrl/conversations'),
+          Uri.parse('$baseUrl/conversations'),
           headers: headers,
         ).timeout(const Duration(seconds: 15));
 
@@ -118,7 +120,7 @@ class ChatbotService {
       final client = http.Client();
       try {
         final response = await client.get(
-          Uri.parse('$_baseUrl/conversations/$conversationId'),
+          Uri.parse('$baseUrl/conversations/$conversationId'),
           headers: headers,
         ).timeout(const Duration(seconds: 15));
 
@@ -155,7 +157,7 @@ class ChatbotService {
       final client = http.Client();
       try {
         final response = await client.post(
-          Uri.parse('$_baseUrl/conversations/$conversationId/messages'),
+          Uri.parse('$baseUrl/conversations/$conversationId/messages'),
           headers: headers,
           body: jsonEncode({'content': content}),
         ).timeout(const Duration(seconds: 20)); // Waktu lebih lama karena bot mungkin memerlukan waktu untuk merespons
@@ -196,7 +198,7 @@ class ChatbotService {
       final client = http.Client();
       try {
         final response = await client.get(
-          Uri.parse('$_baseUrl/conversations/$conversationId/messages'),
+          Uri.parse('$baseUrl/conversations/$conversationId/messages'),
           headers: headers,
         ).timeout(const Duration(seconds: 15));
 
@@ -236,7 +238,7 @@ class ChatbotService {
       final client = http.Client();
       try {
         final response = await client.delete(
-          Uri.parse('$_baseUrl/conversations/$conversationId'),
+          Uri.parse('$baseUrl/conversations/$conversationId'),
           headers: headers,
         ).timeout(const Duration(seconds: 15));
 

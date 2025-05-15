@@ -1,6 +1,7 @@
 // lib/services/supabase_auth_service.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:frontend/config/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' hide User; // Penting untuk hide User!
 import 'package:frontend/config/supabase_config.dart';
@@ -12,8 +13,9 @@ import 'package:frontend/shared/notification.dart';
 class SupabaseAuthService {
   final SupabaseClient _supabase = SupabaseConfig.client;
   
-  // Base URL dari API backend Anda
-  static const String baseUrl = 'http://192.168.1.17:3000/api/auth'; // Sesuaikan dengan URL backend Anda
+  // Dapatkan base URL dari konfigurasi
+  static String get baseUrl => '${AppConfig.instance.apiBaseUrl}/auth';
+  static int get timeout => AppConfig.instance.timeout; // Replace with your actual API URL
   
   // Fungsi utama untuk Google Sign In yang akan dipanggil dari berbagai tombol
   Future<bool> handleGoogleSignIn(BuildContext context) async {

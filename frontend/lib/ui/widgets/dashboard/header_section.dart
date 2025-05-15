@@ -11,10 +11,10 @@ class HeaderSection extends StatefulWidget {
   final VoidCallback onSubmitThoughts;
 
   const HeaderSection({
-    Key? key,
+    super.key,
     required this.thoughtsController,
     required this.onSubmitThoughts,
-  }) : super(key: key);
+  });
 
   @override
   State<HeaderSection> createState() => _HeaderSectionState();
