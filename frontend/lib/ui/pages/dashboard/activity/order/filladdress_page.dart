@@ -52,37 +52,37 @@ class FillAddressPage extends StatelessWidget {
                 ),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Step 1 (Set address - active)
                   CircleAvatar(
                     radius: 12,
-                    backgroundColor: const Color(0xFF1ABC9C),
-                    child: const Text(
+                    backgroundColor: Color(0xFF1ABC9C),
+                    child: Text(
                       "1",
                       style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     "Set address",
                     style: TextStyle(fontSize: 14, color: Color(0xFF1ABC9C), fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.chevron_right, size: 18),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
+                  Icon(Icons.chevron_right, size: 18),
+                  SizedBox(width: 8),
                   // Step 2 (Confirm Order - inactive)
                   CircleAvatar(
                     radius: 12,
                     backgroundColor: Color(0xFFE0E0E0),
-                    child: const Text(
+                    child: Text(
                       "2",
                       style: TextStyle(color: Colors.black54, fontSize: 12),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     "Confirm Order",
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
@@ -94,7 +94,7 @@ class FillAddressPage extends StatelessWidget {
                 child: Column(
                   children: [
                     // Address Section
-                    _AddressSection(
+                    const _AddressSection(
                       icon: Icons.location_on_outlined,
                       label: "User",
                       value:
@@ -103,21 +103,21 @@ class FillAddressPage extends StatelessWidget {
                     // Divider
                     _SectionDivider(),
                     // City Section
-                    _AddressSection(
+                    const _AddressSection(
                       icon: Icons.location_on_outlined,
                       label: "CITY",
                       value: "YOGYAKARTA",
                     ),
                     _SectionDivider(),
                     // Region Section
-                    _AddressSection(
+                    const _AddressSection(
                       icon: Icons.location_on_outlined,
                       label: "REGION",
                       value: "INDONESIA",
                     ),
                     _SectionDivider(),
                     // Contact Section
-                    _AddressSection(
+                    const _AddressSection(
                       icon: Icons.person_outline,
                       label: "SIGAP Official",
                       value: "+62 8722-1092-8752",
