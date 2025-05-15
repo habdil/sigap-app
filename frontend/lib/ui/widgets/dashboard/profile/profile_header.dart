@@ -145,11 +145,8 @@ class _ProfileHeaderState extends State<ProfileHeader> {
   }
 
   void _showEditProfileDialog() {
-    // Create controllers for each field to set initial values
-    final ageController = TextEditingController(text: _userProfile?.age?.toString() ?? '');
-    final heightController = TextEditingController(text: _userProfile?.height?.toString() ?? '');
-    final weightController = TextEditingController(text: _userProfile?.weight?.toString() ?? '');
-
+    // Here you can implement the edit profile dialog
+    // similar to the one we created earlier
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -160,46 +157,54 @@ class _ProfileHeaderState extends State<ProfileHeader> {
             fontWeight: semiBold,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Input fields for profile editing
-            TextField(
-              controller: ageController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Age',
-                labelStyle: greyTextStyle,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+        content: StatefulBuilder(
+          builder: (context, setState) {
+            final ageController = TextEditingController(text: _userProfile?.age?.toString() ?? '');
+            final heightController = TextEditingController(text: _userProfile?.height?.toString() ?? '');
+            final weightController = TextEditingController(text: _userProfile?.weight?.toString() ?? '');
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Input fields for profile editing
+                TextField(
+                  controller: ageController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Age',
+                    labelStyle: greyTextStyle,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: heightController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Height (cm)',
-                labelStyle: greyTextStyle,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: heightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Height (cm)',
+                    labelStyle: greyTextStyle,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: weightController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Weight (kg)',
-                labelStyle: greyTextStyle,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: weightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Weight (kg)',
+                    labelStyle: greyTextStyle,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
         actions: [
           TextButton(
