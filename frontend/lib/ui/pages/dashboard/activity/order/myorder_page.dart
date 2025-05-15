@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/pages/order/checkout_page.dart';
-import 'package:frontend/ui/pages/order/orderdetail_page.dart'; // Add this import
+import 'package:frontend/ui/pages/dashboard/activity/order/checkout_page.dart';
+import 'package:frontend/ui/pages/dashboard/activity/order/orderdetail_page.dart'; // Add this import
 
 class MyOrderPage extends StatefulWidget {
   const MyOrderPage({Key? key}) : super(key: key);

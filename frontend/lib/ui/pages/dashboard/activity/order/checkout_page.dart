@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/pages/dashboard/sport/activity_page.dart';
-import 'package:frontend/ui/pages/order/filladdress_page.dart';
+import 'package:frontend/ui/pages/dashboard/activity/order/myorder_page.dart'; // Add this import
 
-class SetAddressPage extends StatefulWidget {
-  const SetAddressPage({super.key});
+class CheckoutPage extends StatefulWidget {
+  const CheckoutPage({Key? key}) : super(key: key);
 
   @override
-  State<SetAddressPage> createState() => _SetAddressPageState();
+  State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
-class _SetAddressPageState extends State<SetAddressPage> {
+class _CheckoutPageState extends State<CheckoutPage> {
   int selectedShipping = 0;
 
   @override
@@ -34,7 +34,7 @@ class _SetAddressPageState extends State<SetAddressPage> {
                       );
                     },
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
                         "Confirm Your Order",
@@ -61,93 +61,85 @@ class _SetAddressPageState extends State<SetAddressPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          // Step 1 (Set address - active)
-                          const CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Color(0xFF1ABC9C),
-                            child: Text(
-                              "1",
-                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            "Set address",
-                            style: TextStyle(fontSize: 14, color: Color(0xFF1ABC9C), fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(Icons.chevron_right, size: 18),
-                          const SizedBox(width: 8),
-                          // Step 2 (Confirm Order - inactive)
+                          // Step 1 (Set address - inactive)
                           CircleAvatar(
                             radius: 12,
                             backgroundColor: Colors.grey[300],
                             child: const Text(
-                              "2",
+                              "1",
                               style: TextStyle(color: Colors.black54, fontSize: 12),
                             ),
                           ),
                           const SizedBox(width: 8),
                           const Text(
-                            "Confirm Order",
+                            "Set address",
                             style: TextStyle(fontSize: 14, color: Colors.black54),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.chevron_right, size: 18),
+                          const SizedBox(width: 8),
+                          // Step 2 (Confirm Order - active)
+                          CircleAvatar(
+                            radius: 12,
+                            backgroundColor: Color(0xFF1ABC9C),
+                            child: const Text(
+                              "2",
+                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "Confirm Order",
+                            style: TextStyle(fontSize: 14, color: Color(0xFF1ABC9C), fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
-                    // Address Section (empty)
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const FillAddressPage()),
-                        );
-                      },
-                      child: Container(
-                        color: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFF3F0),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.location_on_outlined,
-                                color: Color(0xFFFF5722),
-                                size: 20,
-                              ),
+                    // Address Section
+                    Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF3F0),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            const SizedBox(width: 16),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "User",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Fill your address here...",
-                                    style: TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 13,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            child: const Icon(
+                              Icons.location_on_outlined,
+                              color: Color(0xFFFF5722),
+                              size: 20,
                             ),
-                            const Icon(Icons.chevron_right, color: Colors.black54),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  "User",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "Jl. Sunan Giri, RT.05/RW.13, Candi Winangun, Sardonoharjo, Kec. Ngaglik, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55581",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 13,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right, color: Colors.black54),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -191,8 +183,8 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Row(
-                                      children: [
+                                    Row(
+                                      children: const [
                                         Expanded(
                                           child: Text(
                                             "Tumblr",
@@ -212,8 +204,8 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                         ),
                                       ],
                                     ),
-                                    const Row(
-                                      children: [
+                                    Row(
+                                      children: const [
                                         Spacer(),
                                         Text(
                                           "Coins",
@@ -225,7 +217,7 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                       ],
                                     ),
                                     const SizedBox(height: 2),
-                                    const Row(
+                                    Row(
                                       children: [
                                         Text(
                                           "SIGAP ",
@@ -235,7 +227,7 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                             fontSize: 18,
                                           ),
                                         ),
-                                        Text(
+                                        const Text(
                                           "Tumblr",
                                           style: TextStyle(
                                             color: Colors.black,
@@ -251,8 +243,8 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                       color: Colors.black26,
                                     ),
                                     const SizedBox(height: 8),
-                                    const Row(
-                                      children: [
+                                    Row(
+                                      children: const [
                                         Expanded(
                                           child: Text(
                                             "Color",
@@ -267,8 +259,8 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                         ),
                                       ],
                                     ),
-                                    const Row(
-                                      children: [
+                                    Row(
+                                      children: const [
                                         Expanded(
                                           child: Text(
                                             "Size",
@@ -283,8 +275,8 @@ class _SetAddressPageState extends State<SetAddressPage> {
                                         ),
                                       ],
                                     ),
-                                    const Row(
-                                      children: [
+                                    Row(
+                                      children: const [
                                         Expanded(
                                           child: Text(
                                             "Quantity",
@@ -305,9 +297,9 @@ class _SetAddressPageState extends State<SetAddressPage> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                            children: const [
                               Text(
                                 "Subtotal",
                                 style: TextStyle(
@@ -424,7 +416,10 @@ class _SetAddressPageState extends State<SetAddressPage> {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement your submit logic here
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyOrderPage()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFF5722), // Orange
@@ -450,6 +445,7 @@ class _SetAddressPageState extends State<SetAddressPage> {
     );
   }
 
+  // Update the _buildShippingOption method:
   Widget _buildShippingOption({
     required bool isSelected,
     required String title,

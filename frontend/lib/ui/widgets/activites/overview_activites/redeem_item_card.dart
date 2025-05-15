@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
-import 'package:frontend/ui/pages/order/setaddress_page.dart';
+import 'package:frontend/ui/pages/dashboard/activity/order/setaddress_page.dart';
 
 /// Redeem item card
 class RedeemItemCard extends StatelessWidget {

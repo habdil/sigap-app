@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/pages/order/checkout_page.dart';
-import 'package:frontend/ui/pages/order/setaddress_page.dart'; // Change import
+import 'package:frontend/ui/pages/dashboard/activity/order/checkout_page.dart';
+import 'package:frontend/ui/pages/dashboard/activity/order/setaddress_page.dart'; // Change import
 
 class FillAddressPage extends StatelessWidget {
   const FillAddressPage({Key? key}) : super(key: key);

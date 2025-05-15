@@ -15,7 +15,7 @@ class AppConfig {
 
   factory AppConfig.development() {
     return AppConfig._(
-      apiBaseUrl: 'http://192.168.1.16:3000/api',
+      apiBaseUrl: 'http://69.62.82.146:3000/api',
       environment: Environment.dev,
     );
   }

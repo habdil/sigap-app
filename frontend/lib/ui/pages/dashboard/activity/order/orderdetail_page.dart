@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/ui/pages/order/myorder_page.dart';
+import 'package:frontend/ui/pages/dashboard/activity/order/myorder_page.dart';
 
 class OrderDetailPage extends StatelessWidget {
   const OrderDetailPage({Key? key}) : super(key: key);
