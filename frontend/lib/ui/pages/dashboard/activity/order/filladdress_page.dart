@@ -6,7 +6,8 @@ import 'package:frontend/ui/widgets/activites/order/custom_header.dart';
 import 'package:frontend/ui/widgets/activites/order/order_stepper.dart';
 import 'package:frontend/ui/widgets/activites/order/privacy_policy_text.dart';
 import 'package:frontend/ui/widgets/activites/order/save_button.dart';
-import 'package:frontend/ui/widgets/activites/order/section_divider.dart'; // Change import
+import 'package:frontend/ui/widgets/activites/order/section_divider.dart';
+
 
 class FillAddressPage extends StatelessWidget {
   const FillAddressPage({Key? key}) : super(key: key);
@@ -28,14 +29,13 @@ class FillAddressPage extends StatelessWidget {
                 );
               },
             ),
-            const OrderStepper(
-              isFirstStepActive: true,
-              isSecondStepActive: false,
-            ),
+            // Stepper
+            const OrderStepper(),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    // Address Section
                     const AddressSectionFill(
                       icon: Icons.location_on_outlined,
                       label: "User",
@@ -73,8 +73,7 @@ class FillAddressPage extends StatelessWidget {
       ),
       bottomNavigationBar: Container(
         color: const Color(0xFFF6F6F6),
-        padding: EdgeInsets.fromLTRB(
-            24, 16, 24, MediaQuery.of(context).padding.bottom + 16),
+        padding: EdgeInsets.fromLTRB(24, 16, 24, MediaQuery.of(context).padding.bottom + 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
