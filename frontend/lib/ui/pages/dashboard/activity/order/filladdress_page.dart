@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/pages/dashboard/activity/order/checkout_page.dart';
-import 'package:frontend/ui/pages/dashboard/activity/order/setaddress_page.dart'; // Change import
+import 'package:frontend/ui/pages/dashboard/activity/order/setaddress_page.dart';
+import 'package:frontend/ui/widgets/activites/order/address_section_fill.dart'; // Change import
 
 class FillAddressPage extends StatelessWidget {
   const FillAddressPage({Key? key}) : super(key: key);
@@ -23,7 +24,8 @@ class FillAddressPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => SetAddressPage()),
+                        MaterialPageRoute(
+                            builder: (context) => SetAddressPage()),
                       );
                     },
                   ),
@@ -52,37 +54,43 @@ class FillAddressPage extends StatelessWidget {
                 ),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   // Step 1 (Set address - active)
                   CircleAvatar(
                     radius: 12,
-                    backgroundColor: Color(0xFF1ABC9C),
-                    child: Text(
+                    backgroundColor: const Color(0xFF1ABC9C),
+                    child: const Text(
                       "1",
-                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(width: 8),
-                  Text(
+                  const SizedBox(width: 8),
+                  const Text(
                     "Set address",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF1ABC9C), fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF1ABC9C),
+                        fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(width: 8),
-                  Icon(Icons.chevron_right, size: 18),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.chevron_right, size: 18),
+                  const SizedBox(width: 8),
                   // Step 2 (Confirm Order - inactive)
                   CircleAvatar(
                     radius: 12,
                     backgroundColor: Color(0xFFE0E0E0),
-                    child: Text(
+                    child: const Text(
                       "2",
                       style: TextStyle(color: Colors.black54, fontSize: 12),
                     ),
                   ),
-                  SizedBox(width: 8),
-                  Text(
+                  const SizedBox(width: 8),
+                  const Text(
                     "Confirm Order",
                     style: TextStyle(fontSize: 14, color: Colors.black54),
                   ),
@@ -94,7 +102,7 @@ class FillAddressPage extends StatelessWidget {
                 child: Column(
                   children: [
                     // Address Section
-                    const _AddressSection(
+                    AddressSectionFill(
                       icon: Icons.location_on_outlined,
                       label: "User",
                       value:
@@ -103,21 +111,21 @@ class FillAddressPage extends StatelessWidget {
                     // Divider
                     _SectionDivider(),
                     // City Section
-                    const _AddressSection(
+                    AddressSectionFill(
                       icon: Icons.location_on_outlined,
                       label: "CITY",
                       value: "YOGYAKARTA",
                     ),
                     _SectionDivider(),
                     // Region Section
-                    const _AddressSection(
+                    AddressSectionFill(
                       icon: Icons.location_on_outlined,
                       label: "REGION",
                       value: "INDONESIA",
                     ),
                     _SectionDivider(),
                     // Contact Section
-                    const _AddressSection(
+                    AddressSectionFill(
                       icon: Icons.person_outline,
                       label: "SIGAP Official",
                       value: "+62 8722-1092-8752",
@@ -131,7 +139,8 @@ class FillAddressPage extends StatelessWidget {
       ),
       bottomNavigationBar: Container(
         color: const Color(0xFFF6F6F6),
-        padding: EdgeInsets.fromLTRB(24, 16, 24, MediaQuery.of(context).padding.bottom + 16),
+        padding: EdgeInsets.fromLTRB(
+            24, 16, 24, MediaQuery.of(context).padding.bottom + 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
