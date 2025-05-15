@@ -97,7 +97,7 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: const ProfilePage(),
+          home: const SplashPage(),
         ),
       ),
     );
