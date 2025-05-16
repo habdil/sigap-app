@@ -107,7 +107,7 @@ Widget build(BuildContext context) {
           TextField(
             controller: _emailController,
             decoration: InputDecoration(
-              hintText: 'Enter Email/Username',
+              hintText: 'Enter Email',
               hintStyle: greyTextStyle,
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: greyColor),
