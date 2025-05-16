@@ -81,7 +81,7 @@ Stroke remains a leading cause of death and disability worldwide, with a signifi
 #### Backend Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/sigap-app.git
+git clone https://github.com/habdil/sigap-app.git
 cd sigap-app/backend
 
 # Set up environment variables
@@ -152,7 +152,7 @@ Main endpoints include:
 
 ## 👨‍💻 Contributors
 This project was developed as part of the Google Solution Challenge 2025 by:
-- Habdil Iqrawardana - Husler
+- Habdil Iqrawardana - Hustler
 - Rakha Dzikra Guevara - Hipster
 - Khoirul Rizal Kalam - Hacker (Frontend Developer)
 - Abdullah Alhwyji - Hacker (Backend Developer)
