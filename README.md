@@ -2,7 +2,6 @@
 ```
 <div align="center">
   <img src="docs/logo/ic_logo_sigap.png" alt="SIGAP Logo" width="200"/>
-  <h1>SIGAP</h1>
   <p><strong>Smart Intervention for Guarding Against Stroke</strong></p>
 </div>
 
