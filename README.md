@@ -152,7 +152,7 @@ Main endpoints include:
 
 ## 👨‍💻 Contributors
 This project was developed as part of the Google Solution Challenge 2025 by:
-- Habdil Iqrawardana - Husler
+- Habdil Iqrawardana - Hustler
 - Rakha Dzikra Guevara - Hipster
 - Khoirul Rizal Kalam - Hacker (Frontend Developer)
 - Abdullah Alhwyji - Hacker (Backend Developer)
