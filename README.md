@@ -1,187 +1,167 @@
+```
 <div align="center">
   <img src="docs/logo/ic_logo_sigap.png" alt="SIGAP Logo" width="200"/>
-
-  # SIGAP
-
-  *Smart Intervention for Guarding Against Stroke*
-
-  [![Deployed API](https://img.shields.io/badge/API%20Deployed-Live-success.svg)](http://69.62.82.146:3000/api)
-  [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-02569B.svg)](https://flutter.dev/)
-  [![Go](https://img.shields.io/badge/Backend-Golang-00ADD8.svg)](https://golang.org/)
-  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  <h1>SIGAP</h1>
+  <p><strong>Smart Intervention for Guarding Against Stroke</strong></p>
 </div>
 
 ## 🌟 About SIGAP
-
-**SIGAP** is an AI-powered gamified health platform designed to prevent stroke through personalized risk assessments, engaging gamification elements, and community support. Our solution addresses the critical need for effective stroke prevention in Indonesia, where stroke prevalence has reached 8.3 per 1,000 population and accounts for 18.5% of total deaths.
+SIGAP is an AI-powered gamified health platform designed to prevent stroke through personalized risk assessments, engaging gamification elements, and community support. Our solution addresses the critical need for effective stroke prevention in Indonesia, where stroke prevalence has reached 8.3 per 1,000 population and accounts for 18.5% of total deaths.
 
 <div align="center">
   <img src="docs/ui/ui-design-main-future.png" alt="SIGAP UI" width="800"/>
 </div>
 
-### 🔑 Key Features
-
-- 🔮 Personalized Stroke Risk Prediction  
-- 🎮 Gamified Health Improvement Journey  
-- 🍎 AI-Based Nutrition Monitoring  
-- 🏃‍♀️ Activity Tracking  
-- 🤖 Personalized Health Chatbot  
-
----
-
 ## 🌊 Background & Motivation
-
 Stroke remains a leading cause of death and disability worldwide, with a significant impact on Indonesia. Despite the availability of various health applications, many lack personalization and engaging elements, leading to suboptimal user adherence. Research indicates that gamification can effectively facilitate behavior change and enhance user engagement in health interventions. However, there is a scarcity of platforms that integrate AI-driven personalized risk assessments with gamified health promotion strategies specifically targeting stroke prevention.
 
----
-
-## 💡 Feature Details
+## 💡 Key Features
 
 ### 🔮 Personalized Stroke Risk Prediction
-- AI-powered algorithms analyze individual health data, lifestyle habits, and known risk factors  
-- Tailored recommendations and action plans to mitigate identified risks  
-- Regular progress tracking and risk reassessment  
+- AI-powered algorithms analyze individual health data, lifestyle habits, and known risk factors
+- Tailored recommendations and action plans to mitigate identified risks
+- Regular progress tracking and risk reassessment
 
 ### 🎮 Gamified Health Improvement Journey
-- Engaging challenges, rewards, and progress tracking  
-- Points and badges for completing health-related activities  
-- Achievement system fostering continuous engagement  
+- Engaging challenges, rewards, and progress tracking to motivate users
+- Points and badges for completing health-related activities
+- Achievement system fostering continuous engagement
 
 ### 🍎 AI-Based Nutrition Monitoring
-- Photo-based food logging  
-- AI analysis of caloric and nutritional content  
-- Personalized dietary feedback and recommendations  
-- Healthy food suggestions  
+- Photo-based food logging for easy meal tracking
+- AI analysis of caloric and nutritional content
+- Personalized dietary feedback and recommendations
+- Healthy food suggestions based on user preferences and health needs
 
 ### 🏃‍♀️ Activity Tracking
-- Jogging and yoga tracking with real-time metrics  
-- Personalized workout recommendations  
-- Activity history and progress visualization  
+- Jogging and yoga tracking with real-time metrics
+- Personalized workout recommendations
+- Activity history and progress visualization
 
 ### 🤖 Personalized Health Chatbot
-- AI-powered health assistant  
-- Answers to health questions  
-- Reminders and tips  
+- AI-powered health assistant for guidance and motivation
+- Answers to health questions and concerns
+- Reminders and tips for maintaining healthy habits
 
----
+## 🧰 Technology Stack
 
-## 🌐 Access the API
+<div align="center">
+  <img src="docs/logo/flutter.png" alt="Flutter" height="50"/>
+  <img src="docs/logo/golang.png" alt="Golang" height="50"/>
+  <img src="docs/logo/gemini.png" alt="Gemini AI" height="50"/>
+  <img src="docs/logo/supabase.png" alt="Supabase" height="50"/>
+  <img src="docs/logo/posgre.png" alt="PostgreSQL" height="50"/>
+  <img src="docs/logo/docker.png" alt="Docker" height="50"/>
+</div>
 
-The SIGAP backend API is live at:  
-👉 **http://69.62.82.146:3000/api**
+### Frontend
+- **Flutter**: Cross-platform UI toolkit for building natively compiled applications
+- **BLoC Pattern**: For state management and separation of concerns
+- **RESTful API Integration**: Seamless communication with backend services
 
+### Backend
+- **Golang**: High-performance backend API
+- **Supabase**: Backend-as-a-Service for authentication and database management
+- **PostgreSQL**: Reliable database for storing user data and application information
+- **Gemini AI**: Advanced AI model for personalized health insights and recommendations
+- **Docker**: Containerization for consistent deployment and scalability
 
----
+## 🚀 Getting Started
 
-## 🚀 Local Development
+### Prerequisites
+- Flutter SDK (latest version)
+- Go 1.19+
+- Docker & Docker Compose
+- PostgreSQL
+- Supabase account
+- Gemini API key
 
-### 1. Clone the Repository
+### Installation & Setup
+
+#### Backend Setup
 ```bash
-git clone https://github.com/habdil/sigap-app.git
-cd sigap-app
-2. Backend Setup
-bash
-Copy
-Edit
-cd backend
+# Clone the repository
+git clone https://github.com/yourusername/sigap-app.git
+cd sigap-app/backend
+
+# Set up environment variables
 cp .env.example .env
-# Edit the .env file with your configuration
+# Edit .env file with your credentials
 
+# Run with golang
 go run main.go
+```
 
-3. Frontend Setup
-bash
-Copy
-Edit
+#### Frontend Setup
+```bash
+# Navigate to frontend directory
 cd ../frontend
+
+# Install dependencies
 flutter pub get
+
+# Run the application
 flutter run
+```
 
-🧰 Technology Stack
----
-<div align="center"> <img src="docs/logo/flutter.png" alt="Flutter" height="50"/> <img src="docs/logo/golang.png" alt="Golang" height="50"/> <img src="docs/logo/gemini.png" alt="Gemini AI" height="50"/> <img src="docs/logo/supabase.png" alt="Supabase" height="50"/> <img src="docs/logo/posgre.png" alt="PostgreSQL" height="50"/> <img src="docs/logo/docker.png" alt="Docker" height="50"/> </div>
----
-🖥️ Frontend
-Flutter: Cross-platform UI toolkit
+## 📱 Application Structure
 
-BLoC Pattern: For state management
-
-RESTful API Integration
-
-🖧 Backend
-Golang: High-performance API
-
-Supabase: Auth & database service
-
-PostgreSQL: Robust relational database
-
-Gemini AI: Personalized health insights
-
-Docker: Containerization
----
-📁 Application Structure
-Backend
-bash
-Copy
-Edit
+### Backend Structure
+```
 📁 backend/
-├── config/         # Configuration
-├── controllers/    # Request handlers
-├── middlewares/    # Middleware functions
-├── models/         # Data models
-├── repository/     # Data access logic
-├── routes/         # API routes
-├── services/       # Business logic
-├── utils/          # Helper functions
-└── main.go         # Entry point
-Frontend
-bash
-Copy
-Edit
+    📁 config/         # Application configuration
+    📁 controllers/    # Request handlers
+    📁 middlewares/    # Custom middleware functions
+    📁 models/         # Data models
+    📁 repository/     # Data access layer
+    📁 routes/         # API routes
+    📁 services/       # Business logic
+    📁 utils/          # Helper functions
+    📄 main.go         # Application entry point
+```
+
+### Frontend Structure
+```
 📁 frontend/
-├── assets/         # Static files
-└── lib/
-    ├── blocs/      # BLoC architecture
-    ├── config/     # App config
-    ├── models/     # Data models
-    ├── providers/  # State providers
-    ├── services/   # API interaction
-    ├── shared/     # Shared widgets
-    ├── ui/         # UI components
-    └── main.dart   # Entry point
-🔌 API Endpoints
-Main endpoints:
+    📁 assets/         # Images, fonts, and other static files
+    📁 lib/
+        📁 blocs/      # Business Logic Components
+        📁 config/     # App configuration
+        📁 models/     # Data models
+        📁 providers/  # Provider components
+        📁 services/   # API services
+        📁 shared/     # Shared components
+        📁 ui/         # UI components and pages
+        📄 main.dart   # Application entry point
+```
 
-GET /api/auth – User authentication
+## 🌐 API Endpoints
+The SIGAP backend API is deployed and available at:
+```
+http://69.62.82.146:3000/api
+```
 
-GET /api/profile – Profile management
+Main endpoints include:
+- `/api/auth` - Authentication endpoints
+- `/api/profile` - User profile management
+- `/api/assessment` - Health risk assessment
+- `/api/activity` - Activity tracking
+- `/api/food` - Food logging and analysis
+- `/api/chatbot` - Chatbot interaction
+- `/api/coin` - Rewards system
 
-POST /api/assessment – Stroke risk prediction
+## 👨‍💻 Contributors
+This project was developed as part of the Google Solution Challenge 2025 by:
+- Habdil Iqrawardana - Husler
+- Rakha Dzikra Guevara - Hipster
+- Khoirul Rizal Kalam - Hacker (Frontend Developer)
+- Abdullah Alhwyji - Hacker (Backend Developer)
 
-POST /api/activity – Activity tracking
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-POST /api/food – Nutrition logging
-
-POST /api/chatbot – AI assistant
-
-GET /api/coin – Reward system
----
-👥 Development Team
-UII INFORVATION TEAM
-Name	Role	Position
-Habdil Iqrawardana	Product Manager	Hustler
-Rakha Dzikra Guevara	UI/UX Designer	Hipster
-Khoirul Rizal Kalam	Frontend Developer	Hacker
-Abdullah Alhwyji	Backend Developer	Hacker
----
-📄 License
-This project is licensed under the MIT License – see the LICENSE file for details.
-
-🙏 Acknowledgements
-Google Solution Challenge 2025
-
-Ministry of Health Indonesia
-
-All beta testers and early supporters
-
-<div align="center"> Made with ❤️ by the SIGAP Team </div> ```
+## 🙏 Acknowledgements
+- Google Solution Challenge 2025
+- Ministry of Health Indonesia for health data
+- All beta testers and supporters
+```
