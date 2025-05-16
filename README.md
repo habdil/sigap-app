@@ -81,7 +81,7 @@ Stroke remains a leading cause of death and disability worldwide, with a signifi
 #### Backend Setup
 ```bash
 # Clone the repository
-git clone [https://github.com/habdil/sigap-app.git](https://github.com/habdil/sigap-app.git)
+git clone https://github.com/habdil/sigap-app.git
 cd sigap-app/backend
 
 # Set up environment variables
