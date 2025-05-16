@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:frontend/models/user_profile_model.dart';
+import 'package:frontend/services/profile_service.dart';
 import 'package:frontend/shared/theme.dart';
 import 'package:frontend/ui/widgets/sport/jogging/activity_metrics.dart';
 import 'package:frontend/ui/widgets/sport/jogging/activity_stats.dart';
@@ -10,7 +12,17 @@ import 'package:frontend/ui/widgets/sport/jogging/jogging_app_bar.dart';
 import 'package:frontend/ui/widgets/sport/jogging/route_visualization.dart';
 import 'package:frontend/ui/widgets/sport/jogging/weather_gps_info.dart';
 import 'package:frontend/shared/notification.dart';
+import 'package:frontend/models/activity_model.dart';
+import 'package:frontend/blocs/activity_bloc.dart';
+import 'package:frontend/models/coin_transaction_model.dart';
+import 'package:provider/provider.dart';
 import 'dart:math' as math;
+import 'package:frontend/ui/pages/dashboard/sport/jogging_component/confirmation_dialog.dart';
+import 'package:frontend/ui/pages/dashboard/sport/jogging_component/menu_bottom_sheet.dart';
+import 'package:frontend/ui/pages/dashboard/sport/jogging_component/settings_dialog.dart';
+import 'package:frontend/ui/pages/dashboard/sport/jogging_component/history_dialog.dart';
+import 'package:frontend/ui/pages/dashboard/sport/jogging_component/help_dialog.dart';
+import 'package:frontend/ui/pages/dashboard/sport/jogging_component/activity_summary_dialog.dart';
 
 class JoggingPage extends StatefulWidget {
   const JoggingPage({Key? key}) : super(key: key);
@@ -31,6 +43,7 @@ class _JoggingPageState extends State<JoggingPage> {
   int _calories = 0;
   int _steps = 0;
   int _coins = 0;
+  double _userWeight = 70.0; // Default weight in kg (akan diganti dengan data pengguna asli jika tersedia)
   
   // Time tracking
   Timer? _timer;
@@ -42,12 +55,70 @@ class _JoggingPageState extends State<JoggingPage> {
   final Random _random = math.Random();
   final List<double> _speedVariations = [];
   
+  // For tracking the route (dummy data)
+  final Map<String, dynamic> _locationData = {
+    'start': {'lat': -7.755, 'lng': 110.408},
+    'end': {'lat': -7.759, 'lng': 110.415},
+    'path': []
+  };
+  
+  // Heart rate simulation
+  int _heartRateAvg = 0;
+  
+  // Weather condition (dummy data)
+  String _weatherCondition = 'Sunny';
+  
+  late ActivityBloc _activityBloc;
+  bool _isSavingActivity = false;
+  
   @override
   void initState() {
     super.initState();
     // Generate random speed variations for simulation
     for (int i = 0; i < 30; i++) {
       _speedVariations.add(2.0 + _random.nextDouble() * 3.0); // Speeds between 2.0 and 5.0 km/h
+    }
+    
+    // Initialize heart rate
+    _heartRateAvg = 70 + _random.nextInt(20);
+    
+    // Get the activity bloc
+    _activityBloc = Provider.of<ActivityBloc>(context, listen: false);
+    
+    // TODO: Get user weight from user profile if available
+    _getUserWeight();
+  }
+  
+  // Metode untuk mendapatkan berat badan pengguna dari profil
+  Future<void> _getUserWeight() async {
+    try {
+      print('Fetching user profile data for weight calculation');
+      
+      // Menggunakan ProfileService untuk mendapatkan data profil pengguna
+      final profileResult = await ProfileService.getProfile();
+      
+      if (profileResult['success'] && profileResult['data'] != null) {
+        final UserProfile profile = profileResult['data'];
+        
+        setState(() {
+          // Menggunakan berat dari profil atau default 70.0 kg jika tidak ada
+          _userWeight = profile.weight ?? 70.0;
+          print('User weight set to: $_userWeight kg');
+          
+          // Jika sudah ada data aktivitas, kita perlu menghitung ulang kalori
+          if (_durationInSeconds > 0) {
+            // Hitung ulang kalori berdasarkan berat pengguna baru
+            double durationHours = _durationInSeconds / 3600.0;
+            _calories = (7.0 * _userWeight * durationHours).round();
+          }
+        });
+      } else {
+        print('Failed to get user profile: ${profileResult['message']}');
+        // Tetap gunakan berat default jika gagal mendapatkan profil
+      }
+    } catch (e) {
+      print('Error getting user weight: $e');
+      // Berat default tetap digunakan jika ada error
     }
   }
   
@@ -58,95 +129,28 @@ class _JoggingPageState extends State<JoggingPage> {
   }
   
   void _handleBackPressed() {
-    if (_isRunning) {
-      _showConfirmationDialog();
+    if (_isRunning || _isPaused) {
+      showConfirmationDialog(
+        context: context,
+        onEndActivity: () {
+          _handleStop();
+          Navigator.pop(context);
+        },
+      );
     } else {
       Navigator.pop(context);
     }
   }
   
-  void _showConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('End Activity', style: blackTextStyle.copyWith(fontWeight: semiBold)),
-          content: Text(
-            'Do you want to end your current jogging session?',
-            style: blackTextStyle,
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel', style: greyTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('End', style: orangeTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _handleStop();
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
   void _handleMenuPressed() {
-    // Show menu options
-    showModalBottomSheet(
+    showMenuBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.settings, color: blackColor),
-              title: Text('Settings', style: blackTextStyle),
-              onTap: () {
-                Navigator.pop(context);
-                // Show settings dialog
-                _showSettingsDialog();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.history, color: blackColor),
-              title: Text('Activity History', style: blackTextStyle),
-              onTap: () {
-                Navigator.pop(context);
-                // Show activity history dialog
-                _showHistoryDialog();
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.help_outline, color: blackColor),
-              title: Text('Help', style: blackTextStyle),
-              onTap: () {
-                Navigator.pop(context);
-                // Show help dialog
-                _showHelpDialog();
-              },
-            ),
-            if (_isRunning || _isPaused)
-              ListTile(
-                leading: Icon(Icons.stop_circle, color: Colors.red),
-                title: Text('End Activity', style: blackTextStyle),
-                onTap: () {
-                  Navigator.pop(context);
-                  _handleStop();
-                },
-              ),
-          ],
-        ),
-      ),
+      isRunning: _isRunning,
+      isPaused: _isPaused,
+      onSettingsTap: _showSettingsDialog,
+      onHistoryTap: _showHistoryDialog,
+      onHelpTap: _showHelpDialog,
+      onEndActivityTap: _handleStop,
     );
   }
   
@@ -154,54 +158,31 @@ class _JoggingPageState extends State<JoggingPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Settings', style: blackTextStyle.copyWith(fontWeight: semiBold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SwitchListTile(
-                title: Text('GPS Tracking', style: blackTextStyle),
-                value: _isGpsActive,
-                onChanged: (value) {
-                  Navigator.pop(context);
-                  setState(() {
-                    _isGpsActive = value;
-                  });
-                  
-                  if (!value) {
-                    context.showWarningNotification(
-                      title: 'GPS Disabled',
-                      message: 'Distance tracking may be less accurate',
-                    );
-                  } else {
-                    context.showSuccessNotification(
-                      title: 'GPS Enabled',
-                      message: 'Using GPS for accurate tracking',
-                    );
-                  }
-                },
-              ),
-              SwitchListTile(
-                title: Text('Voice Feedback', style: blackTextStyle),
-                value: true,
-                onChanged: (value) {
-                  Navigator.pop(context);
-                  context.showSuccessNotification(
-                    title: 'Voice Feedback',
-                    message: value ? 'Enabled' : 'Disabled',
-                  );
-                },
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Close', style: orangeTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return SettingsDialog(
+          isGpsActive: _isGpsActive,
+          onGpsChanged: (value) {
+            setState(() {
+              _isGpsActive = value;
+            });
+            
+            if (!value) {
+              context.showWarningNotification(
+                title: 'GPS Disabled',
+                message: 'Distance tracking may be less accurate',
+              );
+            } else {
+              context.showSuccessNotification(
+                title: 'GPS Enabled',
+                message: 'Using GPS for accurate tracking',
+              );
+            }
+          },
+          onVoiceFeedbackChanged: (value) {
+            context.showSuccessNotification(
+              title: 'Voice Feedback',
+              message: value ? 'Enabled' : 'Disabled',
+            );
+          },
         );
       },
     );
@@ -211,18 +192,7 @@ class _JoggingPageState extends State<JoggingPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Activity History', style: blackTextStyle.copyWith(fontWeight: semiBold)),
-          content: const Text('Your activity history will be shown here in the future.'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Close', style: orangeTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return const HistoryDialog();
       },
     );
   }
@@ -231,31 +201,7 @@ class _JoggingPageState extends State<JoggingPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Help', style: blackTextStyle.copyWith(fontWeight: semiBold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('How to use Running Tracker:', style: blackTextStyle.copyWith(fontWeight: medium)),
-              const SizedBox(height: 8),
-              Text('• Press the PLAY button to start tracking', style: blackTextStyle),
-              Text('• Press the PAUSE button to pause', style: blackTextStyle),
-              Text('• Press the STOP button to end activity', style: blackTextStyle),
-              Text('• Press the FLAG button to mark a lap', style: blackTextStyle),
-              const SizedBox(height: 8),
-              Text('Earn 1 coin for each step you take!', style: orangeTextStyle),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Got it', style: orangeTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return const HelpDialog();
       },
     );
   }
@@ -266,6 +212,12 @@ class _JoggingPageState extends State<JoggingPage> {
       _startTime = DateTime.now();
       _currentTime = _startTime;
       _elapsedPauseTime = 0;
+      
+      // Reset location path for new activity
+      _locationData['path'] = [];
+      
+      // Add starting point to path
+      _addPathPoint();
       
       context.showSuccessNotification(
         title: 'Activity Started',
@@ -284,6 +236,9 @@ class _JoggingPageState extends State<JoggingPage> {
     setState(() {
       _isRunning = true;
       _isPaused = false;
+      
+      // Simulate heart rate increase when running starts
+      _heartRateAvg = 110 + _random.nextInt(40);
     });
     
     // Start the timer
@@ -301,11 +256,12 @@ class _JoggingPageState extends State<JoggingPage> {
           
           // Simulate steps (roughly 1.3 steps per second for jogging)
           int newSteps = (_steps + (1 + _random.nextInt(2))).toInt();
-          int stepsDifference = newSteps - _steps;
           _steps = newSteps;
           
-          // Add coins based on steps
-          _coins += stepsDifference;
+          // Every 5 seconds, add a path point for route visualization
+          if (_durationInSeconds % 5 == 0) {
+            _addPathPoint();
+          }
         } else {
           // Less accurate if GPS is off
           double distanceIncrease = (2.5 + _random.nextDouble()) / 3600.0;
@@ -313,7 +269,6 @@ class _JoggingPageState extends State<JoggingPage> {
           
           // Simulate steps (roughly 1 step per second without GPS)
           _steps += 1;
-          _coins += 1;
         }
         
         // Calculate pace (min/km)
@@ -321,10 +276,67 @@ class _JoggingPageState extends State<JoggingPage> {
           _pace = _durationInSeconds / 60 / _distance;
         }
         
-        // Calculate calories burned
-        // Simple formula: ~60 calories per km for a 70kg person
-        _calories = (_distance * 60).toInt();
+        // Calculate calories burned using MET formula from backend
+        // MET for jogging is 7.0
+        double durationHours = _durationInSeconds / 3600.0;
+        _calories = (7.0 * _userWeight * durationHours).round();
+        
+        // Calculate coins using backend formula - will be properly calculated at the end
+        // This is just for UI display during activity
+        _updateCoinsForUI();
+        
+        // Simulate heart rate variations
+        if (_durationInSeconds % 20 == 0) {
+          // Every 20 seconds, slightly adjust heart rate
+          _heartRateAvg += _random.nextInt(11) - 5; // -5 to +5 change
+          
+          // Keep heart rate in a realistic range
+          if (_heartRateAvg < 100) _heartRateAvg = 100 + _random.nextInt(10);
+          if (_heartRateAvg > 180) _heartRateAvg = 180 - _random.nextInt(10);
+        }
       });
+    });
+  }
+  
+  void _updateCoinsForUI() {
+    // Perhitungan koin sesuai dengan backend
+    // Jogging = 0.4 koin per menit
+    double durationMinutes = _durationInSeconds / 60.0;
+    double baseCoins = 0.4 * durationMinutes;
+    
+    // Bonus untuk aktivitas yang lebih lama
+    double bonus = 0;
+    if (durationMinutes >= 60) {
+      bonus = 10; // Bonus besar untuk 1 jam+
+    } else if (durationMinutes >= 45) {
+      bonus = 5;
+    } else if (durationMinutes >= 30) {
+      bonus = 3;
+    }
+    
+    _coins = (baseCoins + bonus).round();
+  }
+  
+  void _addPathPoint() {
+    // Generate a random point deviation from the last point or starting point
+    double latBase = _locationData['start']['lat'];
+    double lngBase = _locationData['start']['lng'];
+    
+    if (_locationData['path'].isNotEmpty) {
+      // Use the last point as the base
+      latBase = _locationData['path'].last['lat'];
+      lngBase = _locationData['path'].last['lng'];
+    }
+    
+    // Add a small random deviation to simulate movement
+    double latDev = (_random.nextDouble() - 0.5) * 0.001; // Small lat deviation
+    double lngDev = (_random.nextDouble() - 0.3) * 0.001; // Small lng deviation, slightly biased towards end
+    
+    // Add the new point to the path
+    _locationData['path'].add({
+      'lat': latBase + latDev,
+      'lng': lngBase + lngDev,
+      'timestamp': DateTime.now().toIso8601String(),
     });
   }
   
@@ -335,6 +347,9 @@ class _JoggingPageState extends State<JoggingPage> {
       _isRunning = false;
       _isPaused = true;
       _currentTime = DateTime.now();
+      
+      // Simulate heart rate decrease when paused
+      _heartRateAvg = max(70, _heartRateAvg - 20);
     });
     
     context.showWarningNotification(
@@ -348,6 +363,23 @@ class _JoggingPageState extends State<JoggingPage> {
     
     // Show activity summary if there was actual activity
     if (_distance > 0 || _durationInSeconds > 0) {
+      // Set the end point of the route
+      _locationData['end'] = {
+        'lat': _locationData['path'].isEmpty ? 
+              _locationData['start']['lat'] : 
+              _locationData['path'].last['lat'],
+        'lng': _locationData['path'].isEmpty ? 
+              _locationData['start']['lng'] : 
+              _locationData['path'].last['lng'],
+      };
+      
+      // Recalculate coins finally using backend logic
+      _calculateFinalCoins();
+      
+      // First save activity to backend
+      _saveActivityToBackend();
+      
+      // Then show summary
       _showActivitySummary();
     }
     
@@ -360,8 +392,93 @@ class _JoggingPageState extends State<JoggingPage> {
       _pace = 0.0;
       _calories = 0;
       _steps = 0;
-      // Keep coins earned
+      _coins = 0; // Reset coins for next session
     });
+  }
+  
+  void _calculateFinalCoins() {
+    // Use the backend coin calculation logic
+    // Untuk Jogging: 0.4 koin per menit
+    double durationMinutes = _durationInSeconds / 60.0;
+    double baseCoins = 0.4 * durationMinutes;
+    
+    // Tambahkan bonus untuk aktivitas yang lebih lama
+    double bonus = 0;
+    if (durationMinutes >= 60) {
+      bonus = 10; // Bonus besar untuk 1 jam+
+    } else if (durationMinutes >= 45) {
+      bonus = 5;
+    } else if (durationMinutes >= 30) {
+      bonus = 3;
+    }
+    
+    _coins = (baseCoins + bonus).round();
+    print('Final coins earned: $_coins (${durationMinutes.toStringAsFixed(1)} minutes)');
+  }
+  
+  Future<void> _saveActivityToBackend() async {
+    if (_isSavingActivity) return; // Prevent multiple save attempts
+    
+    setState(() {
+      _isSavingActivity = true;
+    });
+    
+    try {
+      print("Creating activity with weather: $_weatherCondition");
+      
+      // Make sure the duration is at least 1 minute for the API
+      int durationMinutes = max(1, (_durationInSeconds / 60).ceil());
+      
+      final activityModel = ActivityModel(
+        activityType: 'Jogging',
+        durationMinutes: durationMinutes,
+        distanceKm: _distance,
+        caloriesBurned: _calories,
+        heartRateAvg: _heartRateAvg,
+        activityDate: DateTime.now(),
+        notes: 'Jogging session',
+        weatherCondition: _weatherCondition,
+        locationData: _locationData,
+        avgPace: _pace,
+        coinsEarned: _coins, // Menggunakan perhitungan koin yang benar
+        musicPlayed: 'User playlist', // Dummy data
+      );
+      
+      print('Saving activity to backend: ${activityModel.toJson()}');
+      
+      try {
+        // Coba kirim ke backend
+        final result = await _activityBloc.addActivity(activityModel);
+        
+        if (result) {
+          print('Activity saved successfully to backend');
+          await _activityBloc.getActivities();
+          
+          context.showSuccessNotification(
+            title: 'Activity Saved',
+            message: 'Your jogging session was successfully recorded',
+          );
+        } else {
+          print('Failed to save activity to backend: ${_activityBloc.errorMessage}');
+          
+          context.showErrorNotification(
+            title: 'Save Error',
+            message: 'Failed to save activity: ${_activityBloc.errorMessage}',
+          );
+        }
+      } catch (e) {
+        print('Error saving to backend: $e');
+        
+        context.showErrorNotification(
+          title: 'Error',
+          message: 'An error occurred while saving your activity',
+        );
+      }
+    } finally {
+      setState(() {
+        _isSavingActivity = false;
+      });
+    }
   }
   
   void _handleFlag() {
@@ -375,76 +492,31 @@ class _JoggingPageState extends State<JoggingPage> {
   }
   
   void _showActivitySummary() {
+    // Create a snapshot of the current activity data to pass to the dialog
+    final activityData = {
+      'distance': _distance,
+      'durationInSeconds': _durationInSeconds,
+      'pace': _pace,
+      'calories': _calories,
+      'steps': _steps,
+      'heartRateAvg': _heartRateAvg,
+      'coins': _coins,
+    };
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Activity Summary', style: blackTextStyle.copyWith(fontWeight: semiBold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildSummaryRow('Distance', '${_distance.toStringAsFixed(2)} km'),
-              _buildSummaryRow('Duration', _formatDuration(_durationInSeconds)),
-              _buildSummaryRow('Avg. Pace', '${_pace.toStringAsFixed(1)} min/km'),
-              _buildSummaryRow('Calories', '$_calories kcal'),
-              _buildSummaryRow('Steps', '$_steps steps'),
-              _buildSummaryRow('Coins Earned', '$_coins coins'),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade100),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.emoji_events, color: orangeColor),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Great job! You\'ve earned $_coins coins from this activity.',
-                        style: blackTextStyle.copyWith(fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Share', style: blueTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-                context.showSuccessNotification(
-                  title: 'Sharing',
-                  message: 'Activity shared successfully!',
-                );
-              },
-            ),
-            TextButton(
-              child: Text('Close', style: orangeTextStyle),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+        return ActivitySummaryDialog(
+          activityData: activityData,
+          onShare: () {
+            Navigator.of(context).pop();
+            context.showSuccessNotification(
+              title: 'Sharing',
+              message: 'Activity shared successfully!',
+            );
+          },
         );
       },
-    );
-  }
-  
-  Widget _buildSummaryRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: greyTextStyle),
-          Text(value, style: blackTextStyle.copyWith(fontWeight: semiBold)),
-        ],
-      ),
     );
   }
   
@@ -471,10 +543,15 @@ class _JoggingPageState extends State<JoggingPage> {
     final formattedPace = _pace > 0 ? '${_pace.toStringAsFixed(1)}/km' : '0.0/km';
     final formattedCalories = '$_calories';
     
+    // Today's date for display
+    final today = DateTime.now();
+    final formattedDate = '${today.day} ${_getMonthName(today.month)} ${today.year}';
+    final formattedTime = '${today.hour.toString().padLeft(2, '0')}:${today.minute.toString().padLeft(2, '0')}';
+    
     return WillPopScope(
       onWillPop: () async {
-        if (_isRunning) {
-          _showConfirmationDialog();
+        if (_isRunning || _isPaused) {
+          _handleBackPressed();
           return false;
         }
         return true;
@@ -506,7 +583,7 @@ class _JoggingPageState extends State<JoggingPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10.0),
                         child: Column(
                           children: [
-                            // Route Visualization
+                            // Route Visualization - pass location data if you want to use it
                             const RouteVisualization(),
                             
                             // Distance Display
@@ -521,14 +598,14 @@ class _JoggingPageState extends State<JoggingPage> {
                             
                             SizedBox(height: constraints.maxHeight * 0.05),
                             
-                            // Activity Stats with Graph
+                            // Activity Stats with Graph - Updated reward text
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0),
                               child: ActivityStats(
-                                date: '5 Dec 2025',
-                                time: '10:48',
+                                date: formattedDate,
+                                time: formattedTime,
                                 steps: _steps,
-                                reward: '+1 Coin/step',
+                                reward: '0.4 Coins/min',
                                 coins: _coins,
                               ),
                             ),
@@ -560,5 +637,13 @@ class _JoggingPageState extends State<JoggingPage> {
         ),
       ),
     );
+  }
+  
+  String _getMonthName(int month) {
+    const monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return monthNames[month - 1];
   }
 }

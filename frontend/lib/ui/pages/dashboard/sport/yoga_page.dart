@@ -7,6 +7,11 @@ import 'package:frontend/ui/widgets/sport/yoga/yoga_visualization.dart';
 import 'package:frontend/ui/widgets/sport/yoga/yoga_control_buttons.dart';
 import 'package:frontend/ui/widgets/sport/yoga/music_player.dart';
 import 'package:frontend/shared/notification.dart';
+import 'package:frontend/blocs/activity_bloc.dart';
+import 'package:frontend/models/activity_model.dart';
+import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:intl/intl.dart';
 
 class YogaPage extends StatefulWidget {
   const YogaPage({Key? key}) : super(key: key);
@@ -18,26 +23,59 @@ class YogaPage extends StatefulWidget {
 class _YogaPageState extends State<YogaPage> {
   bool _isRunning = false;
   bool _isPaused = false;
-  int _timerInSeconds = 0;
+  int _timerInSeconds = 0;  // Ini masalahnya! Default 0 berarti timer langsung selesai
+  int _totalSessionDuration = 0; // Track total duration for saving to database
+  DateTime? _sessionStartTime;
   Timer? _timer;
   
   // Music player state
-  String _currentSong = 'Calm music for yoga';
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  int _currentSongIndex = 0;
   bool _isPlaying = false;
   double _songProgress = 0.0;
   Timer? _songTimer;
-  List<String> _yogaMusic = [
-    'Calm music for yoga',
-    'Meditation sounds',
-    'Relaxing nature',
-    'Peaceful harmony',
-    'Deep breathing focus'
+  
+  // Actual music files from assets
+  final List<String> _yogaMusicFiles = [
+    'music/music-1.mp3',
+    'music/music-2.mp3',
+    'music/music-3.mp3',
+    'music/music-4.mp3',
+    'music/music-5.mp3',
   ];
+  
+  // Display names for music files
+  final List<String> _yogaMusicNames = [
+    'Calm Meditation',
+    'Peaceful Flow',
+    'Mindful Breathing',
+    'Gentle Harmony',
+    'Serene Balance',
+  ];
+  
+  // Weather data
+  String _weatherCondition = 'Clear';
+  int _temperature = 28;
+  
+  // Location data - DUMMY DATA
+  Map<String, dynamic> _locationData = {
+    'latitude': -7.7956,
+    'longitude': 110.3695,
+    'timestamp': DateTime.now().toIso8601String(),
+  };
+  
+  @override
+  void initState() {
+    super.initState();
+    // Set default timer value ke 15 menit (900 detik)
+    _timerInSeconds = 900;
+  }
   
   @override
   void dispose() {
     _timer?.cancel();
     _songTimer?.cancel();
+    _audioPlayer.dispose();
     super.dispose();
   }
   
@@ -70,7 +108,7 @@ class _YogaPageState extends State<YogaPage> {
               child: Text('End', style: orangeTextStyle),
               onPressed: () {
                 Navigator.of(context).pop();
-                _handleStop();
+                _handleStop(saveActivity: true);
                 Navigator.pop(context);
               },
             ),
@@ -122,7 +160,7 @@ class _YogaPageState extends State<YogaPage> {
                 title: Text('End Session', style: blackTextStyle),
                 onTap: () {
                   Navigator.pop(context);
-                  _handleStop();
+                  _handleStop(saveActivity: true);
                 },
               ),
           ],
@@ -166,9 +204,11 @@ class _YogaPageState extends State<YogaPage> {
                       
                       // Set timer based on pose duration
                       int minutes = int.parse(pose['duration']!.split(' ')[0]);
-                      _handleStop(); // Reset current timer
+                      _handleStop(saveActivity: false); // Reset current timer without saving
                       _timerInSeconds = minutes * 60;
-                      setState(() {});
+                      setState(() {
+                        _sessionStartTime = DateTime.now();
+                      });
                       _handleStart(); // Start new timer
                     },
                   ),
@@ -211,12 +251,12 @@ class _YogaPageState extends State<YogaPage> {
               ),
               SwitchListTile(
                 title: Text('Background Music', style: blackTextStyle),
-                value: true,
+                value: _isPlaying,
                 onChanged: (value) {
                   Navigator.pop(context);
-                  setState(() {
-                    _isPlaying = value;
-                  });
+                  if (value != _isPlaying) {
+                    _togglePlayMusic();
+                  }
                   context.showSuccessNotification(
                     title: 'Background Music',
                     message: value ? 'Enabled' : 'Disabled',
@@ -257,7 +297,7 @@ class _YogaPageState extends State<YogaPage> {
               const SizedBox(height: 8),
               Text('Try to maintain each pose for the full duration!', style: orangeTextStyle),
               const SizedBox(height: 8),
-              Text('Earn 1 point for each completed yoga session!', style: orangeTextStyle),
+              Text('Earn coins for each completed yoga session!', style: orangeTextStyle),
             ],
           ),
           actions: <Widget>[
@@ -274,14 +314,33 @@ class _YogaPageState extends State<YogaPage> {
   }
   
   void _handleStart() {
+    if (_sessionStartTime == null) {
+      _sessionStartTime = DateTime.now();
+    }
+    
+    // Pastikan timer punya nilai awal jika 0
+    if (_timerInSeconds <= 0) {
+      _timerInSeconds = 900; // Default 15 menit (900 detik) jika timer kosong
+    }
+    
     setState(() {
       _isRunning = true;
       _isPaused = false;
     });
     
+    // Cancel timer yang berjalan jika ada
+    _timer?.cancel();
+    
     // Start the timer
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      
       setState(() {
+        _totalSessionDuration++; // Increment total duration
+        
         if (_timerInSeconds > 0) {
           _timerInSeconds--;
         } else {
@@ -296,6 +355,9 @@ class _YogaPageState extends State<YogaPage> {
               title: 'Yoga Session Complete',
               message: 'Great job! Take a moment to relax.',
             );
+            
+            // Save activity to database
+            _saveActivityToDatabase();
           }
         }
       });
@@ -320,30 +382,90 @@ class _YogaPageState extends State<YogaPage> {
       _isPaused = true;
     });
     
+    // Pause music
+    _audioPlayer.pause();
+    _songTimer?.cancel();
+    
     context.showWarningNotification(
       title: 'Session Paused',
       message: 'Your yoga session is paused',
     );
   }
   
-  void _handleStop() {
+  void _handleStop({bool saveActivity = true}) {
     _timer?.cancel();
     
-    // Show summary if there was any activity
-    if (_timerInSeconds > 0 || _isRunning || _isPaused) {
+    // Stop music
+    _audioPlayer.stop();
+    _songTimer?.cancel();
+    setState(() {
+      _isPlaying = false;
+    });
+    
+    // Show summary and save activity if there was any activity
+    if (saveActivity && _totalSessionDuration > 0) {
+      _saveActivityToDatabase();
       _showSessionSummary();
     }
     
     setState(() {
       _isRunning = false;
       _isPaused = false;
-      _timerInSeconds = 0;
+      _timerInSeconds = 900; // Reset timer ke 15 menit (bukan 0)
+      _totalSessionDuration = 0;
+      _sessionStartTime = null;
     });
+  }
+  
+  Future<void> _saveActivityToDatabase() async {
+    if (_totalSessionDuration < 10) {
+      // Don't save very short sessions (less than 10 seconds)
+      return;
+    }
+    
+    try {
+      // Calculate calories burned (simplified formula for yoga)
+      // Assuming average person burns ~3 calories per minute during yoga
+      int caloriesBurned = (_totalSessionDuration / 60 * 3).round();
+      
+      // Calculate coins earned (1 coin per minute, rounded up)
+      int coinsEarned = ((_totalSessionDuration / 60) + 0.5).floor();
+      if (coinsEarned < 1) coinsEarned = 1; // Minimum 1 coin
+      
+      // Update timestamp in dummy location data
+      _locationData['timestamp'] = DateTime.now().toIso8601String();
+      
+      // Create activity model
+      final activity = ActivityModel(
+        activityType: 'Yoga',
+        durationMinutes: (_totalSessionDuration / 60).ceil(), // Convert seconds to minutes
+        caloriesBurned: caloriesBurned,
+        heartRateAvg: 75, // Default value for yoga
+        activityDate: _sessionStartTime ?? DateTime.now(),
+        notes: 'Yoga session',
+        weatherCondition: _weatherCondition,
+        locationData: _locationData,
+        coinsEarned: coinsEarned,
+        musicPlayed: _yogaMusicNames[_currentSongIndex],
+      );
+      
+      // Use the ActivityBloc to save the activity
+      final activityBloc = Provider.of<ActivityBloc>(context, listen: false);
+      final result = await activityBloc.addActivity(activity);
+      
+      if (result) {
+        print('Yoga activity saved successfully');
+      } else {
+        print('Failed to save yoga activity');
+      }
+    } catch (e) {
+      print('Error saving yoga activity: $e');
+    }
   }
   
   void _handleSkip() {
     if (_isRunning) {
-      context.showInfoNotification(
+      context.showWarningNotification(
         title: 'Pose Skipped',
         message: 'Moving to the next pose',
       );
@@ -351,6 +473,12 @@ class _YogaPageState extends State<YogaPage> {
   }
   
   void _showSessionSummary() {
+    // Calculate calories and duration for display
+    int caloriesBurned = (_totalSessionDuration / 60 * 3).round();
+    int durationMinutes = (_totalSessionDuration / 60).ceil();
+    int coinsEarned = ((_totalSessionDuration / 60) + 0.5).floor();
+    if (coinsEarned < 1) coinsEarned = 1; // Minimum 1 coin
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -380,6 +508,36 @@ class _YogaPageState extends State<YogaPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
+              // Session stats
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.shade100),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Duration:', style: blackTextStyle),
+                        Text('$durationMinutes minutes', style: blackTextStyle.copyWith(fontWeight: medium)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Calories:', style: blackTextStyle),
+                        Text('$caloriesBurned cal', style: blackTextStyle.copyWith(fontWeight: medium)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Coins earned
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -393,7 +551,7 @@ class _YogaPageState extends State<YogaPage> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'You\'ve earned 1 point from this session!',
+                        'You\'ve earned $coinsEarned coins from this session!',
                         style: blackTextStyle.copyWith(fontSize: 12),
                       ),
                     ),
@@ -438,60 +596,89 @@ class _YogaPageState extends State<YogaPage> {
   }
   
   // Music player methods
-  void _togglePlayMusic() {
+  Future<void> _togglePlayMusic() async {
     setState(() {
       _isPlaying = !_isPlaying;
     });
     
     if (_isPlaying) {
-      // Simulate music playing with progress
-      _songTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        setState(() {
-          _songProgress += 0.001;
-          if (_songProgress >= 1.0) {
-            _songProgress = 0.0;
-            _playNextSong();
+      // Play the actual music file
+      try {
+        await _audioPlayer.play(AssetSource(_yogaMusicFiles[_currentSongIndex]));
+        
+        // Update progress bar
+        _songTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) async {
+          try {
+            final position = await _audioPlayer.getCurrentPosition() ?? Duration.zero;
+            final duration = await _audioPlayer.getDuration() ?? Duration(minutes: 3);
+            
+            if (duration.inMilliseconds > 0) {
+              setState(() {
+                _songProgress = position.inMilliseconds / duration.inMilliseconds;
+                
+                // If song ended, play next
+                if (_songProgress >= 0.99) {
+                  _playNextSong();
+                }
+              });
+            }
+          } catch (e) {
+            print('Error updating song progress: $e');
           }
         });
-      });
+      } catch (e) {
+        print('Error playing music: $e');
+        context.showErrorNotification(
+          title: 'Music Error',
+          message: 'Could not play the selected music',
+        );
+      }
     } else {
+      // Pause music
+      await _audioPlayer.pause();
       _songTimer?.cancel();
     }
   }
   
-  void _playPreviousSong() {
-    final currentIndex = _yogaMusic.indexOf(_currentSong);
-    final previousIndex = (currentIndex - 1) % _yogaMusic.length;
+  Future<void> _playPreviousSong() async {
+    await _audioPlayer.stop();
     
     setState(() {
-      _currentSong = _yogaMusic[previousIndex >= 0 ? previousIndex : _yogaMusic.length - 1];
+      _currentSongIndex = (_currentSongIndex - 1) % _yogaMusicFiles.length;
+      if (_currentSongIndex < 0) _currentSongIndex = _yogaMusicFiles.length - 1;
       _songProgress = 0.0;
     });
     
-    context.showInfoNotification(
+    if (_isPlaying) {
+      await _audioPlayer.play(AssetSource(_yogaMusicFiles[_currentSongIndex]));
+    }
+    
+    context.showWarningNotification(
       title: 'Now Playing',
-      message: _currentSong,
+      message: _yogaMusicNames[_currentSongIndex],
     );
   }
   
-  void _playNextSong() {
-    final currentIndex = _yogaMusic.indexOf(_currentSong);
-    final nextIndex = (currentIndex + 1) % _yogaMusic.length;
+  Future<void> _playNextSong() async {
+    await _audioPlayer.stop();
     
     setState(() {
-      _currentSong = _yogaMusic[nextIndex];
+      _currentSongIndex = (_currentSongIndex + 1) % _yogaMusicFiles.length;
       _songProgress = 0.0;
     });
     
-    context.showInfoNotification(
+    if (_isPlaying) {
+      await _audioPlayer.play(AssetSource(_yogaMusicFiles[_currentSongIndex]));
+    }
+    
+    context.showWarningNotification(
       title: 'Now Playing',
-      message: _currentSong,
+      message: _yogaMusicNames[_currentSongIndex],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    
     // Format values for display
     final formattedTime = _formatTime(_timerInSeconds);
     
@@ -543,7 +730,7 @@ class _YogaPageState extends State<YogaPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '32°C',
+                                '$_temperature°C',
                                 style: blackTextStyle.copyWith(
                                   fontSize: 14,
                                   fontWeight: medium,
@@ -570,7 +757,7 @@ class _YogaPageState extends State<YogaPage> {
                             // Timer Display
                             TimerDisplay(
                               time: formattedTime,
-                              subtitle: 'Timer Support',
+                              subtitle: _isRunning ? 'Session in progress' : 'Ready to start',
                             ),
                             
                             SizedBox(height: constraints.maxHeight * 0.05),
@@ -581,6 +768,7 @@ class _YogaPageState extends State<YogaPage> {
                               isPaused: _isPaused,
                               onStart: _handleStart,
                               onPause: _handlePause,
+                              onStop: () => _handleStop(saveActivity: true),
                               onSkip: _handleSkip,
                             ),
                             
@@ -595,7 +783,7 @@ class _YogaPageState extends State<YogaPage> {
                             
                             // Music player
                             MusicPlayer(
-                              currentSong: _currentSong,
+                              currentSong: _yogaMusicNames[_currentSongIndex],
                               isPlaying: _isPlaying,
                               progress: _songProgress,
                               onPlayToggle: _togglePlayMusic,
@@ -613,22 +801,6 @@ class _YogaPageState extends State<YogaPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-extension NotificationExtensions on BuildContext {
-  void showInfoNotification({
-    required String title,
-    required String message,
-    Duration duration = const Duration(seconds: 2),
-  }) {
-    CustomNotification.showNotification(
-      this,
-      title: title,
-      message: message,
-      type: NotificationType.warning,
-      duration: duration,
     );
   }
 }

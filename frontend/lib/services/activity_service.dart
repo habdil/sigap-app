@@ -1,4 +1,4 @@
-// lib/services/activity_service.dart
+// lib/services/activity_service.dart (corrected)
 import 'dart:async';
 import 'dart:convert';
 import 'package:frontend/config/app_config.dart';
@@ -7,8 +7,8 @@ import 'package:frontend/services/storage_service.dart';
 import 'package:frontend/models/activity_model.dart';
 
 class ActivityService {
-  // Dapatkan base URL dari konfigurasi
-  static String get baseUrl => '${AppConfig.instance.apiBaseUrl}/activites';
+  // Corrected the typo in the URL from 'activites' to 'activities'
+  static String get baseUrl => '${AppConfig.instance.apiBaseUrl}/activities';
   
   // Timeout untuk request
   static int get timeout => AppConfig.instance.timeout;

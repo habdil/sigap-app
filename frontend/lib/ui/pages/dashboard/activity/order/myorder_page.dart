@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/ui/pages/dashboard/activity/order/checkout_page.dart';
 import 'package:frontend/ui/pages/dashboard/activity/order/orderdetail_page.dart';
+import 'package:frontend/ui/pages/dashboard/sport/activity_page.dart';
 import 'package:frontend/ui/widgets/activites/order/custom_app_bar.dart';
 import 'package:frontend/ui/widgets/activites/order/empty_order_message.dart';
 import 'package:frontend/ui/widgets/activites/order/order_card.dart';
-import 'package:frontend/ui/widgets/activites/order/order_tab.dart'; // Add this import
+import 'package:frontend/ui/widgets/activites/order/order_tab.dart';
+import 'package:frontend/ui/widgets/dashboard/activity.dart'; // Add this import
 
 class MyOrderPage extends StatefulWidget {
   const MyOrderPage({Key? key}) : super(key: key);
@@ -42,7 +44,7 @@ class _MyOrderPageState extends State<MyOrderPage>
               onBackPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const CheckoutPage()),
+                  MaterialPageRoute(builder: (context) => const ActivityPage()),
                 );
               },
             ),

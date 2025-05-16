@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  audioplayers_windows
   desktop_webview_window
   permission_handler_windows
   url_launcher_windows

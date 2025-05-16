@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/shared/theme.dart';
+import 'package:frontend/ui/pages/dashboard/activity/history/activity_detail_page.dart';
 import 'package:frontend/ui/widgets/activites/overview_activites/history_activity_item.dart';
 import 'package:frontend/models/activity_model.dart';
 import 'package:frontend/blocs/activity_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend/ui/pages/dashboard/activity/history/all_history_activites.dart';
 
 /// History activities section with grid
 class HistoryActivitiesSection extends StatefulWidget {
@@ -81,6 +83,16 @@ class _HistoryActivitiesSectionState extends State<HistoryActivitiesSection> {
     // Otherwise estimate from distance (1 km ≈ 1300 steps)
     final distance = activity.distanceKm ?? 0;
     return (distance * 1300).round();
+  }
+
+  // Navigate to all history activities page
+  void _navigateToAllHistoryActivities() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AllHistoryActivitiesPage(),
+      ),
+    );
   }
 
   // Widget for empty state
@@ -252,10 +264,7 @@ class _HistoryActivitiesSectionState extends State<HistoryActivitiesSection> {
                   ),
                   if (recentActivities.isNotEmpty)
                     TextButton(
-                      onPressed: () {
-                        // Navigate to activity history page
-                        Navigator.pushNamed(context, '/activity-history');
-                      },
+                      onPressed: _navigateToAllHistoryActivities, // Use the navigation method
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         minimumSize: Size.zero,
@@ -315,14 +324,25 @@ class _HistoryActivitiesSectionState extends State<HistoryActivitiesSection> {
                   // Get title from notes or use a default
                   final title = activity.notes ?? 'Activity';
                   
-                  return HistoryActivityItem(
-                    day: _getFormattedDay(activity.activityDate),
-                    activity: activity.activityType.toUpperCase(),
-                    distance: activity.distanceKm ?? 0,
-                    duration: activity.durationMinutes,
-                    title: title,
-                    steps: steps,
-                    bgColor: bgColor,
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to activity detail page when tapping on an activity
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ActivityDetailPage(activity: activity),
+                        ),
+                      );
+                    },
+                    child: HistoryActivityItem(
+                      day: _getFormattedDay(activity.activityDate),
+                      activity: activity.activityType.toUpperCase(),
+                      distance: activity.distanceKm ?? 0,
+                      duration: activity.durationMinutes,
+                      title: title,
+                      steps: steps,
+                      bgColor: bgColor,
+                    ),
                   );
                 },
               ),

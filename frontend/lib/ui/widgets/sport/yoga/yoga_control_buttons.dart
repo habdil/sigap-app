@@ -5,6 +5,7 @@ class YogaControlButtons extends StatelessWidget {
   final VoidCallback onStart;
   final VoidCallback onPause;
   final VoidCallback onSkip;
+  final VoidCallback onStop;
   final bool isRunning;
   final bool isPaused;
 
@@ -13,6 +14,7 @@ class YogaControlButtons extends StatelessWidget {
     required this.onStart,
     required this.onPause,
     required this.onSkip,
+    required this.onStop,
     this.isRunning = false,
     this.isPaused = false,
   });
@@ -32,9 +34,9 @@ class YogaControlButtons extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Square button
+          // Stop button
           GestureDetector(
-            onTap: () {},
+            onTap: onStop,
             child: Container(
               width: smallButtonSize,
               height: smallButtonSize,
