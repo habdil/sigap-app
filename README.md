@@ -1,7 +1,14 @@
 <div align="center">
   <img src="docs/logo/ic_logo_sigap.png" alt="SIGAP Logo" width="200"/>
-  <h1>SIGAP</h1>
-  <p><strong>Smart Intervention for Guarding Against Stroke</strong></p>
+  
+  # SIGAP
+  
+  *Smart Intervention for Guarding Against Stroke*
+  
+  [![Deployed API](https://img.shields.io/badge/API%20Deployed-Live-success.svg)](http://69.62.82.146:3000/api)
+  [![Flutter](https://img.shields.io/badge/Built%20with-Flutter-02569B.svg)](https://flutter.dev/)
+  [![Go](https://img.shields.io/badge/Backend-Golang-00ADD8.svg)](https://golang.org/)
+  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 </div>
 
 ## 🌟 About SIGAP
@@ -11,10 +18,17 @@ SIGAP is an AI-powered gamified health platform designed to prevent stroke throu
   <img src="docs/ui/ui-design-main-future.png" alt="SIGAP UI" width="800"/>
 </div>
 
+### Key Features
+- 🔮 Personalized Stroke Risk Prediction
+- 🎮 Gamified Health Improvement Journey
+- 🍎 AI-Based Nutrition Monitoring
+- 🏃‍♀️ Activity Tracking
+- 🤖 Personalized Health Chatbot
+
 ## 🌊 Background & Motivation
 Stroke remains a leading cause of death and disability worldwide, with a significant impact on Indonesia. Despite the availability of various health applications, many lack personalization and engaging elements, leading to suboptimal user adherence. Research indicates that gamification can effectively facilitate behavior change and enhance user engagement in health interventions. However, there is a scarcity of platforms that integrate AI-driven personalized risk assessments with gamified health promotion strategies specifically targeting stroke prevention.
 
-## 💡 Key Features
+## 💡 Feature Details
 
 ### 🔮 Personalized Stroke Risk Prediction
 - AI-powered algorithms analyze individual health data, lifestyle habits, and known risk factors
@@ -42,46 +56,22 @@ Stroke remains a leading cause of death and disability worldwide, with a signifi
 - Answers to health questions and concerns
 - Reminders and tips for maintaining healthy habits
 
-## 🧰 Technology Stack
+## 🌐 Access the API
+### Online Access
+The SIGAP backend API is deployed and available at:
+http://69.62.82.146:3000/api
 
-<div align="center">
-  <img src="docs/logo/flutter.png" alt="Flutter" height="50"/>
-  <img src="docs/logo/golang.png" alt="Golang" height="50"/>
-  <img src="docs/logo/gemini.png" alt="Gemini AI" height="50"/>
-  <img src="docs/logo/supabase.png" alt="Supabase" height="50"/>
-  <img src="docs/logo/posgre.png" alt="PostgreSQL" height="50"/>
-  <img src="docs/logo/docker.png" alt="Docker" height="50"/>
-</div>
+### Local Development
 
-### Frontend
-- **Flutter**: Cross-platform UI toolkit for building natively compiled applications
-- **BLoC Pattern**: For state management and separation of concerns
-- **RESTful API Integration**: Seamless communication with backend services
-
-### Backend
-- **Golang**: High-performance backend API
-- **Supabase**: Backend-as-a-Service for authentication and database management
-- **PostgreSQL**: Reliable database for storing user data and application information
-- **Gemini AI**: Advanced AI model for personalized health insights and recommendations
-- **Docker**: Containerization for consistent deployment and scalability
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Flutter SDK (latest version)
-- Go 1.19+
-- Docker & Docker Compose
-- PostgreSQL
-- Supabase account
-- Gemini API key
-
-### Installation & Setup
-
-#### Backend Setup
+1. Clone the repository
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/sigap-app.git
-cd sigap-app/backend
+cd sigap-app
+
+Backend Setup
+
+bash# Navigate to backend directory
+cd backend
 
 # Set up environment variables
 cp .env.example .env
@@ -89,7 +79,9 @@ cp .env.example .env
 
 # Run with golang
 go run main.go
+
 Frontend Setup
+
 bash# Navigate to frontend directory
 cd ../frontend
 
@@ -98,6 +90,29 @@ flutter pub get
 
 # Run the application
 flutter run
+🧰 Technology Stack
+<div align="center">
+  <img src="docs/logo/flutter.png" alt="Flutter" height="50"/>
+  <img src="docs/logo/golang.png" alt="Golang" height="50"/>
+  <img src="docs/logo/gemini.png" alt="Gemini AI" height="50"/>
+  <img src="docs/logo/supabase.png" alt="Supabase" height="50"/>
+  <img src="docs/logo/posgre.png" alt="PostgreSQL" height="50"/>
+  <img src="docs/logo/docker.png" alt="Docker" height="50"/>
+</div>
+Frontend
+
+Flutter: Cross-platform UI toolkit for building natively compiled applications
+BLoC Pattern: For state management and separation of concerns
+RESTful API Integration: Seamless communication with backend services
+
+Backend
+
+Golang: High-performance backend API
+Supabase: Backend-as-a-Service for authentication and database management
+PostgreSQL: Reliable database for storing user data and application information
+Gemini AI: Advanced AI model for personalized health insights and recommendations
+Docker: Containerization for consistent deployment and scalability
+
 📱 Application Structure
 Backend Structure
 📁 backend/
@@ -123,8 +138,6 @@ Frontend Structure
         📁 ui/         # UI components and pages
         📄 main.dart   # Application entry point
 🌐 API Endpoints
-The SIGAP backend API is deployed and available at:
-http://69.62.82.146:3000/api
 Main endpoints include:
 
 /api/auth - Authentication endpoints
@@ -135,14 +148,8 @@ Main endpoints include:
 /api/chatbot - Chatbot interaction
 /api/coin - Rewards system
 
-👨‍💻 Contributors
-This project was developed as part of the Google Solution Challenge 2025 by:
-
-Habdil Iqrawardana - Husler
-Rakha Dzikra Guevara - Hipster
-Khoirul Rizal Kalam - Hacker (Frontend Developer)
-Abdullah Alhwyji - Hacker (Backend Developer)
-
+👥 Development Team
+NameRolePositionHabdil IqrawardanaProduct OwnerHuslerRakha Dzikra GuevaraUI/UX DesignerHipsterKhoirul Rizal KalamFrontend DeveloperHackerAbdullah AlhwyjiBackend DeveloperHacker
 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 🙏 Acknowledgements
@@ -152,7 +159,7 @@ Ministry of Health Indonesia for health data
 All beta testers and supporters
 
 
-This is now ready for you to copy and paste directly into your README.md file. I've:
-1. Removed the extra backticks at the beginning and end
-2. Kept all your team members information
-3. Ensured all formatting is correct and consistent
+<div align="center">
+  Made with ❤️ by the SIGAP Team
+</div>
+```
