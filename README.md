@@ -70,6 +70,7 @@ Stroke remains a leading cause of death and disability worldwide, with a signifi
 The SIGAP backend API is live at:  
 👉 **http://69.62.82.146:3000/api**
 
+
 ---
 
 ## 🚀 Local Development
@@ -95,8 +96,11 @@ Edit
 cd ../frontend
 flutter pub get
 flutter run
+
 🧰 Technology Stack
+---
 <div align="center"> <img src="docs/logo/flutter.png" alt="Flutter" height="50"/> <img src="docs/logo/golang.png" alt="Golang" height="50"/> <img src="docs/logo/gemini.png" alt="Gemini AI" height="50"/> <img src="docs/logo/supabase.png" alt="Supabase" height="50"/> <img src="docs/logo/posgre.png" alt="PostgreSQL" height="50"/> <img src="docs/logo/docker.png" alt="Docker" height="50"/> </div>
+---
 🖥️ Frontend
 Flutter: Cross-platform UI toolkit
 
@@ -114,7 +118,7 @@ PostgreSQL: Robust relational database
 Gemini AI: Personalized health insights
 
 Docker: Containerization
-
+---
 📁 Application Structure
 Backend
 bash
@@ -161,15 +165,15 @@ POST /api/food – Nutrition logging
 POST /api/chatbot – AI assistant
 
 GET /api/coin – Reward system
-
+---
 👥 Development Team
 UII INFORVATION TEAM
 Name	Role	Position
-Habdil Iqrawardana	Product Owner	Hustler
+Habdil Iqrawardana	Product Manager	Hustler
 Rakha Dzikra Guevara	UI/UX Designer	Hipster
 Khoirul Rizal Kalam	Frontend Developer	Hacker
 Abdullah Alhwyji	Backend Developer	Hacker
-
+---
 📄 License
 This project is licensed under the MIT License – see the LICENSE file for details.
 
